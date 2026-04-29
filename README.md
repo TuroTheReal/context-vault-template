@@ -15,6 +15,10 @@
 
 ---
 
+> ⚠️ **Early stage / experimental.** The AI generates notes, you review them. Always double-check every ingestion output before merging — a wrong note is worse than no note (false context, wasted time, compounding errors). The PR-on-ingest workflow (see `git_mode.notes: true`) is the intended safety net.
+
+---
+
 ## 📑 Table of Contents
 
 - [📌 About](#-about)
