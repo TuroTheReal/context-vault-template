@@ -48,6 +48,19 @@ Mention source(s) in the first line of the body (before TLDR / content). Format:
 
 **Notes are factual summaries. Never invent, infer beyond the source, or stylize for effect.** Every claim in a note must trace to a source (its `sources:` URL or a citation). If a fact is not in the source, it doesn't go in the note. This rule applies to all notes — `project-`, `decision-`, `context-` — not just `My position:` (which has a stricter version of this rule).
 
+### Author attribution — explicit only
+
+Set `author:` in the frontmatter **only when the source explicitly identifies an owner / author**. Acceptable signals:
+
+- Notion page property `Created by` or in-body line like `**Owner:** <Name>` / `Author: <Name>`
+- Slack message: the actual `from` of the message
+- GitHub PR / issue: the `Author:` field
+- Meeting note: the explicit author of the prep doc (not "the meeting happened with X" — that's a participant, not an author)
+
+**Never infer** from « X is owner of the parent project » or « X is the most-cited person in the body ». Those are guesses, not attribution. If the source doesn't say who wrote it, leave `author:` empty.
+
+Same rule for `My position:` entries: only capture what the user actually said in a source where the user is identified as the speaker. Never attribute to the user a "we said" / "we discussed" from a page in another team's space.
+
 ### Prefixes — decide by CONTENT, not title
 
 Read the source content deeply before choosing a type. Never type from title alone.

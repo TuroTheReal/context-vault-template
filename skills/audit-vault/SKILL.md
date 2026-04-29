@@ -23,7 +23,7 @@ Read-only health check across `<vault>/notes/`, `<vault>/raw/`, `<vault>/index.m
 
 All optional:
 
-- `--checks <comma-separated>` — limit to a subset. Available: `stale-notes`, `broken-links`, `orphan-stubs`, `schema-violations`, `pending-raws`, `contradictions`, `dead-sources`, `orphan-notes`, `raw-note-coherence`. Default: all.
+- `--checks <comma-separated>` — limit to a subset. Available: `stale-notes`, `broken-links`, `orphan-stubs`, `schema-violations`, `pending-raws`, `contradictions`, `dead-sources`, `orphan-notes`, `raw-note-coherence`, `suspicious-attributions`. Default: all.
 - `--output <terminal|markdown|both>` — terminal default, markdown writes to `<vault>/audit-report-YYYY-MM-DD.md` (gitignored), `both` does both.
 - `--verbose` — include exact file paths and line numbers for every finding (default: summary counts + first few examples per check).
 
@@ -165,6 +165,21 @@ For each raw:
 **Output**: list `<file> | broken-ref: <target> | direction: note→raw | raw→note | asymmetric`.
 
 **Suggested action**: re-ingest the note (which rebuilds the link) or manual fix in frontmatter.
+
+### 10. suspicious-attributions
+
+**What** — patterns suggesting an `author:` or `My position:` was inferred rather than taken from an explicit source signal. Hallucination-prevention check.
+
+**How** — for each note:
+- If `author:` is set → verify the corresponding source content (re-fetch if needed) contains an explicit owner/author signal: a Notion `**Owner:** <Name>` line, a `Created by` property, a Slack message author, a GitHub PR author. If the named `author` does NOT appear in such an explicit signal → flag.
+- If a `My position:` section exists → verify the source explicitly attributes a stance to the user (Slack message authored by them, their comment on a PR, prep doc they wrote). If the source is in another team's space (Notion ancestor path under a different team's hub) and uses generic "we" → flag.
+- If `author: <user's name>` → extra-strict check: the source must be authored by the user, not just mention them. Notion ancestor path must include a personal/team space they own. Otherwise → flag.
+
+**Why** — agents can infer authorship from circumstantial evidence (parent project owner, frequent mentions). These inferences violate the « never invent or infer » rule and can fabricate stances the user never expressed. This check surfaces the pattern.
+
+**Output**: list `<note-path> | attribution: <author or My position> | reason: <ancestor mismatch | no explicit owner signal | inferred from parent project>`. Suggested action: re-fetch source, verify explicit signal, remove or correct attribution.
+
+**Note** — this check makes a network call when re-fetching the source. Skip with `--checks ...` exclusion if rate-limited. Cheaper alternative: only run on notes created in the last N days (`--since <date>`).
 
 ## Report format
 

@@ -74,6 +74,10 @@ Read `<vault>/CLAUDE.md` in full. Never operate from memory. The schema is the s
 
 **Faithfulness rule** — the synthesized note is a **factual summary** of the source. Never invent, infer beyond what the source states, or stylize. If a fact is not in the source, it does not go in the note. Same rule as CLAUDE.md « Note format » section. This is non-negotiable: a note that adds a fact not in its source is a bug, not a feature.
 
+**Author attribution — explicit only**: set `author:` in the note frontmatter **only when the source explicitly identifies an owner / author** (Notion page `Created by` or in-body `**Owner:** <Name>` / `Author: <Name>` line; Slack message `from`; GitHub PR `Author:`; meeting prep doc with named author). **Never infer** from « X is owner of the parent project » or « X is the most-cited person in the content ». If the source doesn't explicitly say who wrote it, leave `author:` empty. Same strict rule for `My position:` entries — only when the source explicitly identifies the speaker as the user. Never attribute a "we said" from a page in another team's space.
+
+**Verify the source's home before attributing**: read the Notion ancestor path (`<ancestor-path>` in the fetched content) or the Slack channel / GitHub repo. If the source lives in another team's space and uses "we" referring to that team, the attribution and any "My position" framing must reflect that — not the user. When in doubt → no `author:`, no `My position:` entry.
+
 ### Step 3 — read index.md and decide create vs update
 
 - Read `<vault>/index.md` to get the catalog.
