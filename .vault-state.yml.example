@@ -1,0 +1,13 @@
+# Context Vault — Dynamic State (template)
+# Copy to .vault-state.yml at bootstrap. GITIGNORED — local state, not shared via git.
+# Auto-updated by /fetch-sources (high-water marks).
+# Safe to delete: skills will require --since on next fetch per source to re-bootstrap.
+
+# High-water mark per source — last successful fetch timestamp (ISO 8601)
+# null = never fetched yet, /fetch-sources will require --since to bootstrap
+last_fetch:
+  slack: null
+  notion: null
+  github: null
+  web: null
+  meetings: null

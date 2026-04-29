@@ -1,0 +1,43 @@
+# Context Vault — Operational Config (template)
+# Copy to .vault-config.yml and adapt to your context.
+# Read by all skills (capture, ingest, fetch-sources, audit-vault).
+# Committed to git. Dynamic state lives in .vault-state.yml (gitignored).
+
+# Vault location (absolute path)
+vault_path: /path/to/your/context-vault
+
+# Your handles per source — used by deterministic API filters in /fetch-sources
+# Adapt to your stack: Slack OR Discord OR Teams, GitHub OR GitLab, Notion OR Confluence, etc.
+user_handle:
+  slack: "@your.handle"               # or your Discord username, your Teams email, etc.
+  github: "your-github-username"      # or GitLab/Bitbucket equivalent
+  notion: "Your Name"                 # display name as it appears in mentions
+
+# Git workflow
+git_mode:
+  notes: true                         # /ingest opens a PR for note changes (review + rollback)
+  raw: false                          # /capture writes raw direct (no synthesis to review, just archive)
+git_remote: null                      # set to "<owner>/<repo>" once your private GitHub/GitLab repo is created
+branch_prefix: vault-sync             # branches: vault-sync/YYYY-MM-DD-<slug>
+auto_merge: false                     # never. PR review is the safety net.
+
+# Fetch-sources — which sources to sweep in batch
+# Enable only the sources you actually use. Adapt the source list to your stack.
+fetch_sources:
+  slack: false                        # set true if you use Slack
+  notion: false                       # set true if you use Notion
+  github: false                       # set true if you use GitHub
+  web: false                          # enable when web.feeds is non-empty
+  meetings: false                     # enable when your transcripts tool is set up
+  # Add more here as you wire new sources (discord, jira, linear, gitlab, confluence, etc.)
+
+# Per-source extras
+notion:
+  tracked_databases: []               # explicit Notion DB IDs to sweep beyond mention/edit detection
+web:
+  feeds: []                           # opt-in RSS URLs (no generic crawl)
+
+# Audit thresholds (in days)
+audit:
+  stale_note_days: 90                 # status: active + updated > X days → flagged stale
+  pending_raw_days: 30                # ingested: false + captured > X days → flagged pending

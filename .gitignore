@@ -1,0 +1,16 @@
+# Obsidian local state (workspace, plugins, etc.)
+.obsidian/
+
+# Dynamic vault state (auto-updated by /fetch-sources, local only)
+.vault-state.yml
+.vault-state.yml.lock
+
+# Audit reports (generated artefacts, not vault content)
+audit/audit-*.md
+
+# OS / editor noise
+.DS_Store
+*.swp
+*~
+.idea/
+.vscode/
