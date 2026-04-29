@@ -168,7 +168,8 @@ If `<vault>/.vault-config.yml` `git_mode.notes: true`:
 
 ```
 git fetch origin main
-git checkout -b vault-sync/YYYY-MM-DD-<short-slug>     # or reuse if exists
+git checkout -b vault-sync/YYYY-MM-DD-<short-slug> origin/main   # always branch off origin/main, regardless of current branch
+# (if branch already exists locally → see "Branch reuse / conflict" below; the skill will checkout the existing branch instead of recreating)
 git add notes/<note>.md index.md log.md
 git add raw/<path>.md                                   # if raw frontmatter changed
 git commit -m "ingest: <action> <note-name> from <short source label>"
