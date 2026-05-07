@@ -9,9 +9,17 @@ vault_path: /path/to/your/context-vault
 # Your handles per source — used by deterministic API filters in /fetch-sources
 # Adapt to your stack: Slack OR Discord OR Teams, GitHub OR GitLab, Notion OR Confluence, etc.
 user_handle:
-  slack: "@your.handle"               # or your Discord username, your Teams email, etc.
+  slack: "@your.handle"               # display handle
+  slack_user_id: "U00000000"          # Slack ID (used by /daily-digest for self-DM target if cron added later)
   github: "your-github-username"      # or GitLab/Bitbucket equivalent
-  notion: "Your Name"                 # display name as it appears in mentions
+  github_org: "your-org"              # --owner scope for gh search (excludes personal repos from the sweep)
+  github_repo_exclude:                # additional client-side filter after pull (catch repos that slipped --owner)
+    - "your-username/personal-repo"
+  notion: "Your Name"                 # display name (do NOT use as filter, noisy with homonyms)
+  notion_user_id: ""                  # UUID resolved once via notion-search query_type=user (cache for deterministic created_by filter)
+  linear: "you@example.com"           # email for the deterministic /fetch-sources filter
+  linear_user_id: ""                  # UUID resolved once via Linear list_users (cache for stability)
+  email: "you@example.com"            # primary mail address
 
 # Git workflow
 git_mode:
@@ -26,10 +34,12 @@ auto_merge: false                     # never. PR review is the safety net.
 fetch_sources:
   slack: false                        # set true if you use Slack
   notion: false                       # set true if you use Notion
-  github: false                       # set true if you use GitHub
+  github: false                       # set true if you use GitHub (PRs + issues)
+  github_discussions: false           # set true if you use GitHub Discussions (separate cycle, GraphQL via gh api)
+  linear: false                       # set true if you use Linear
   web: false                          # enable when web.feeds is non-empty
   meetings: false                     # enable when your transcripts tool is set up
-  # Add more here as you wire new sources (discord, jira, linear, gitlab, confluence, etc.)
+  # Add more here as you wire new sources (discord, jira, gitlab, confluence, etc.)
 
 # Per-source extras
 notion:

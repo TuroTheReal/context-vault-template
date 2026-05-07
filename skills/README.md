@@ -8,8 +8,9 @@ This folder is **documentation only** — no install script, no symlinks. If you
 
 - [capture/](capture/SKILL.md) — archive a single source as raw, no synthesis
 - [ingest/](ingest/SKILL.md) — synthesize a source into a vault note
-- [fetch-sources/](fetch-sources/SKILL.md) — batch capture across configured sources
+- [fetch-sources/](fetch-sources/SKILL.md) — batch capture across configured sources, writes a daily summary in `digest/`
 - [audit-vault/](audit-vault/SKILL.md) — flag stale notes, broken links, schema violations
+- [daily-digest/](daily-digest/SKILL.md) — consume the fetch summary + chat live → produce a curated digest (Brief + Inbox) in `journal/`
 
 ## Backlog (to document later)
 

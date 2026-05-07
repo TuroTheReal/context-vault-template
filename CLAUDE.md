@@ -13,8 +13,9 @@ A wrong note is WORSE than no note — false context, wasted time, compounding e
 The vault is operated via 4 user-level skills. Full SKILL.md files live in `skills/`. This is just a pointer.
 
 - **`/capture <URL>`** — archive a source as raw (full content for volatile sources, stub for stable ones). No synthesis.
-- **`/ingest <URL | raw-file>`** — synthesize into `notes/`. Runs `/capture` internally if given a URL. On stub raw, does a live fetch of the source.
-- **`/fetch-sources [--since DATE]`** — batch capture across configured sources (Slack/Notion/GitHub/...). Manual at first, cron later. Uses high-water mark per source.
+- **`/ingest <URL | raw-file | digest-summary>`** — synthesize into `notes/`. Runs `/capture` internally if given a URL. On stub raw, does a live fetch of the source. Can also synthesize a fetch-summary in `digest/` (e.g. weekly synthesis).
+- **`/fetch-sources [--since DATE] [--summary brief|full|none]`** — batch capture across configured sources (Slack/Notion/GitHub/Linear/GH Discussions/...). Writes a single dated summary file to `<vault>/digest/<date>-fetch-summary.md` (append intra-day). Manual at first, cron later. Uses high-water mark per source.
+- **`/daily-digest [--since DATE]`** — consume the fetch-summary in `digest/` + chat live re-pull → produce a curated digest (Brief + Inbox) in `<vault>/journal/<date>-digest.md` (append intra-day). Mechanical generation, zero meta-commentary.
 - **`/audit-vault`** — flags stale notes, broken links, orphan stubs, schema violations, raws pending triage. Writes detailed reports to `<vault>/audit/audit-YYYY-MM-DD.md` (gitignored) and one compact line to `log.md` per run. Suggests cleanups; never auto-applies.
 
 Skills read two config files at the vault root:
