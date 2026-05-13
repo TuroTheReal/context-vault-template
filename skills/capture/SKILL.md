@@ -74,6 +74,7 @@ Does not read `.vault-state.yml` (no high-water mark needed for single-source ca
    - If raw was `ingested: false` → leave as-is (still pending triage)
    - If raw was `ingested: stale` → leave as-is
    - If raw was `ingested: orphan` → not applicable (source disappeared, can't have re-fetched it)
+   - If raw was `ingested: rejected` → flip to `ingested: stale` (source evolved after rejection; force re-triage — content may have gained vault-relevant material since the original rejection)
 8. **Output** — print the absolute path of the raw file created or updated, and its status (`created`, `appended`, `skipped`).
 
 ## Frontmatter to write

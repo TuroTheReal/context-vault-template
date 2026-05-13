@@ -168,7 +168,7 @@ title: [optional — for stub raws, helps triage at a glance]
 author: [optional]
 channel: [optional — slack/notion/etc. context]
 stable: false                        # true if stub raw (stable source, brief only — no content duplicated)
-ingested: false                      # false | true | stale | orphan
+ingested: false                      # false | true | stale | orphan | rejected
 ingested_in: [decision-xyz.md]       # reverse lookup, filled when ingested
 ```
 
@@ -183,6 +183,7 @@ ingested_in: [decision-xyz.md]       # reverse lookup, filled when ingested
   - `true` = synthesized in `notes/`, raw matches the version that was ingested.
   - `stale` = was ingested, but source has since evolved (new content appended). Note may be outdated → re-check before next ingest.
   - `orphan` = stub raw whose source is no longer reachable (404, page deleted). The associated note (if any) keeps its content but the source URL is dead. `/audit-vault` flags these so the user decides: leave as historical record or remove the dead link.
+  - `rejected` = reviewed by `/ingest`, decided NOT to promote to a note. Reason in body (`<!-- Ingest decision: ... -->`). Common cases: logistics-only meeting, generic technical learning belonging in a personal techno vault, no domain-specific decision/position/tradeoff. `/audit-vault` excludes `rejected` from pending-triage list.
 
 ## Ingestion
 
