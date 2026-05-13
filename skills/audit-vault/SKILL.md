@@ -99,10 +99,11 @@ For each raw:
 - Has `type: raw`, `source`, `source_id`, `date`, `captured_at`, `stable`, `ingested`?
 - **Format checks**:
   - `date:` and `captured_at:` match expected formats (YYYY-MM-DD, ISO 8601 respectively)
-  - `ingested` is one of `false | true | stale | orphan`
+  - `ingested` is one of `false | true | stale | orphan | rejected`
   - `stable` is bool
 - If `ingested: true` → `ingested_in:` non-empty?
 - If `ingested: orphan` → `dead_at:` set?
+- If `ingested: rejected` → body contains `<!-- INGEST DECISION` or `<!-- Ingest decision` marker (reason for rejection)
 
 **Why** — schema evolves; old notes must catch up. Silent violations break tooling assumptions downstream.
 
@@ -114,8 +115,9 @@ For each raw:
 
 **How** — for each `raw/*/*.md`:
 - If `ingested: false` AND `captured_at:` older than `audit.pending_raw_days` (default 30) → flag
+- **Excluded from this check**: `ingested: true | stale | orphan | rejected` (already triaged or actively flagged elsewhere).
 
-**Why** — raws that linger un-triaged are signal that something's off in the workflow (no triage cadence, raws not relevant after all). Forces a decision: ingest or accept-as-consultable-only (still `false`, but a deliberate choice).
+**Why** — raws that linger un-triaged are signal that something's off in the workflow (no triage cadence, raws not relevant after all). Forces a decision: ingest or `ingested: rejected` (deliberate "not for vault" with body reason).
 
 **Output**: list `<raw-path> | captured: YYYY-MM-DD (X days ago) | source: <URL>`. Suggested action: triage decision.
 
