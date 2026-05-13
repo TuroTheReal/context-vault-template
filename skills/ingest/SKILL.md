@@ -24,7 +24,8 @@ Synthesizes a source into `<vault>/notes/`. Two entry flows converge on the same
 One of:
 
 - **`<URL>`** — origin URL. Flow B (direct). Calls `/capture` internally first, then synthesizes. Examples: any URL accepted by `/capture`.
-- **`<path-to-raw>`** — local raw file. Flow A. Reads the raw, synthesizes from it (or live-fetches the source if the raw is a stub).
+- **`<path-to-raw>`** — local raw file (`.md`). Flow A. Reads the raw, synthesizes from it (or live-fetches the source if the raw is a stub).
+- **`<path-to-quill>.qm`** — local Quill meeting file. Flow C (Quill). Converts to `.md` first via `tools/qm-to-md.py`, then proceeds as Flow A.
 
 Optional flags:
 - `--force-create` — bypass the « update existing note on same topic » detection. Use when you genuinely want a separate note despite topic overlap.
@@ -58,11 +59,29 @@ Read `<vault>/CLAUDE.md` in full. Never operate from memory. The schema is the s
 ### Step 1 — resolve raw
 
 - **Flow B (URL given)**: call `/capture <URL>` first → get the raw path back. Continue as flow A.
+- **Flow C (Quill `.qm` path given)**:
+  - Run `python3 <vault>/tools/qm-to-md.py <path>.qm` → generates a `.md` raw next to the `.qm` (same name, `.md` extension).
+  - The `.qm` file stays as **append-only archive** (never modified).
+  - Continue as Flow A with the generated `.md` path.
+  - If the `.md` already exists and you need to regenerate (e.g. speakers fixed manually), use `python3 ... --force` before re-ingesting.
 - **Flow A (raw path given)**:
   - Read the raw file (frontmatter + body).
   - If `stable: true` (stub raw) → **live-fetch** the source URL now. The stub is metadata only; synthesis needs current content. **If the live-fetch fails (404 / unreachable)** → flip the stub to `ingested: orphan` + set `dead_at: <today>`, abort synthesis, tell the user. Do NOT create or update a note from a dead source.
   - If `stable: false` (full raw) → use the body as content.
   - If `ingested: stale` → enter **semantic diff mode** (see Step 4b).
+
+#### Quill `.qm` specifics
+
+- **Format**: proprietary Quill QMv2 (UTF-8 JSON inside).
+- **Conversion lives in** `<vault>/tools/qm-to-md.py` (read source for full extraction logic).
+- **What the script extracts**:
+  - Meeting metadata (title, dates, language, tags, participants) → frontmatter
+  - Speakers mapping from `meeting.speakers[].name` (Quill stores real names when it knows the contact; unknown speakers stay as `SPK-<id>` in the transcript — manual find/replace if needed)
+  - Quill-generated Notes: **Minutes** (structured summary), **1:1 Summary** (table), **Follow-ups V3** (blurb + action items)
+  - Raw audio transcript (for reference, not for synthesis)
+- **Brief** (top of body): auto-extracted from `followupsV3.blurb` (Quill's own summary).
+- **Filtering rule during synthesis (Step 2-4)**: meetings often contain off-topic chatter (vacations, anecdotes, weekend plans). The raw `.md` captures everything faithfully (archive), but the vault note synthesizes **only work content** (decisions, plans, action items, learnings). Apply the `content > event` rule strictly.
+- **Append-only**: never modify or delete the `.qm`. The `.md` is the working artifact; the `.qm` is the canonical archive.
 
 ### Step 2 — analyze content
 
