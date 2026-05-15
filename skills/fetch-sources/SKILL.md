@@ -222,10 +222,12 @@ Then dedup client-side by `thread_ts` (a message can surface in both queries).
 
 **Concerns me filter** (deterministic API queries, scope `--owner=<user_handle.github_org>` to exclude personal repos) :
 
-- `gh search prs --author=<user_handle.github> --owner=<user_handle.github_org> --state=all --updated=">=<since>" --limit=100`
-- `gh search prs --review-requested=<user_handle.github> --owner=<user_handle.github_org> --state=all --updated=">=<since>" --limit=100`
+- `gh search prs --author=<user_handle.github> --owner=<user_handle.github_org> --state=open --updated=">=<since>" --limit=100`
+- `gh search prs --review-requested=<user_handle.github> --owner=<user_handle.github_org> --state=open --updated=">=<since>" --limit=100`
 - `gh search issues --assignee=<user_handle.github> --owner=<user_handle.github_org> --updated=">=<since>" --limit=100`
 - `gh search issues --mentions=<user_handle.github> --owner=<user_handle.github_org> --updated=">=<since>" --limit=100`
+
+**Rule on merged/closed PRs** : **NEVER capture** PRs in state `merged` or `closed`, neither authored by the user nor review-requested. No daily informative value (history lives natively in GitHub and in weekly recap rituals). Hence `--state=open` is mandatory on both `gh search prs` queries above (instead of legacy `--state=all`). If a historical recap is needed, it belongs to `/audit-vault` or a weekly-summary skill, not to this daily/manual sweep.
 
 **Explicit exclusions** (config `user_handle.github_repo_exclude`) : any listed repo is filtered client-side after pull. E.g. personal portfolio repos out of work scope.
 

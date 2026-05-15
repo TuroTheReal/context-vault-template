@@ -84,10 +84,10 @@ For each item, determine state. The classification is **deterministic** : same f
 
 #### Follow-up / "ball with others" (annotation in the Brief, not a separate section)
 
-These items go in the Brief of their respective source with status emoji (⏳ waiting / ✅ done / 💬 closed), NOT in a dedicated Follow-up section.
+These items go in the Brief of their respective source with status emoji (⏳ waiting / 💬 closed conversation), NOT in a dedicated Follow-up section.
 
 - **Slack thread / DM** : last message from you, no reply from contact since N hours → ⏳ in Brief Slack.
-- **GitHub PR** : your PR awaiting review (no review yet) → ⏳ in Brief GitHub. Merged PR → ✅ in Brief GitHub.
+- **GitHub PR** : your PR awaiting review (no review yet) → ⏳ in Brief GitHub. **Merged/closed PRs : NEVER in the Brief** (filtered upstream, see dedicated rule below).
 - **Linear issue** : assigned to you, status `started`, blocked by waiting comment from someone else → ⏳ in Brief Linear.
 
 #### Passive (info only, in the Brief)
@@ -105,7 +105,8 @@ These items go in the Brief of their respective source with status emoji (⏳ wa
 - **Empty sections → don't display** (Inbox empty, 🤖 Auto-tagged PRs empty, GH Discussions 0 captured, etc.). Better than displaying "0 items".
 - **No circular auto-reference** in the brief (no "details in Inbox" placeholder pointing further down — either list items in the brief, or omit, but no placeholder).
 - **No "Validations" / "Limitations" / "Info / Skips" sections** in the daily output. These metadata live in `digest/<date>-fetch-summary.md`. The digest is a readable artifact, not a debug report.
-- **No separate "Follow-up" section**. Items "ball with others / closed / done / merged" annotated **directly in the Brief** by item, via status emoji. Avoids Brief↔Follow-up duplication for the same PR/thread.
+- **No separate "Follow-up" section**. Items "ball with others" annotated **directly in the Brief** by item, via status emoji (⏳ waiting, 💬 closed conversation). Avoids Brief↔Follow-up duplication for the same PR/thread.
+- **No merged/closed PRs in the Brief, EVER.** No daily informative value (history lives natively in GitHub). Filter upstream in `/fetch-sources` (use `--state=open` on `gh search prs` queries). Applies to both authored PRs already merged and review-requested PRs already merged/closed.
 - **No duplication** between Brief and Inbox. If an item is in Inbox (ball-in-your-court actionable), it does NOT appear in the Brief. Brief = passive/info items only.
 - **Bots/apps Slack auto** (Slackbot OoO notifs on colleagues, integration bots, app webhooks) → do not mention. Not in Brief, not in Inbox. Filter upstream (in `/fetch-sources`).
 - **Slack mention format** : use `@username` (readable) rather than `<@USER_ID|username>` (Slack native format). **Exception** : in the `:linear-todo:` / `:linear-done:` block of any recurrent task draft section (which will be copy-pasted to Slack), keep `<@USER_ID|username>` for Slack to resolve the mention as clickable.
@@ -114,19 +115,20 @@ These items go in the Brief of their respective source with status emoji (⏳ wa
 
 When an item is mentioned in the Brief, the agent prepends the emoji that reflects its state :
 
-- ✅ done / merged / closed (no action expected, info)
-- 💬 closed conversation (the other replied, conversation done)
+- 💬 closed conversation (the other replied, conversation done — Slack/Gmail only, NEVER PRs merged/closed)
 - ⏳ waiting on others (I posted, I wait)
 - 🔍 review needed (open PR awaiting action — usually moved to Inbox)
 - ➕ new item (created by me recently, info)
 - 📝 edited / commented by me (info)
 
+(The ✅ emoji is no longer used for PRs — merged/closed PRs are filtered upstream and never appear in the Brief.)
+
 Example :
 
 ```markdown
 **GitHub** :
-- ✅ [#90617](url) — fix(clinic) merged 2026-05-05
 - ⏳ [#90801](url) — pushed yesterday, no review yet
+- 🔍 [#90855](url) — review-requested still active
 
 **Slack** :
 - 💬 [DM Person A](url) — "No problem!" (replied, closed)
@@ -170,7 +172,8 @@ The only acceptable annotations in the digest :
 - ...
 
 **GitHub** :
-- ✅/🔍/⏳ [#N](url) — title
+<!-- merged/closed PRs NEVER listed here (filtered upstream via /fetch-sources --state=open) -->
+- 🔍/⏳ [#N](url) — title (open PRs only)
 - ...
 
 [other sources in fixed order, sections with content only]
