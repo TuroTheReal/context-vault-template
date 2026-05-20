@@ -211,8 +211,9 @@ Then dedup client-side by `thread_ts` (a message can surface in both queries).
 
 - Pages where I am the **owner** (Notion `Created by` filter, via `notion-search filters.created_by_user_ids: [<user_handle.notion_user_id>]`).
 - Pages in spaces / databases I explicitly track (config : `notion.tracked_databases: [...]`).
+- Pages I explicitly track individually (config : `notion.tracked_pages: [{id, label, reason}]`). Use case : handover pages where I am neither the creator nor inside a cleanly trackable DB (deeply nested sub-page, or shared DB too noisy to track wholesale). For each entry, call `notion-fetch <id> include_discussions=true` ; surface in summary if `last_edited_time > since[notion]` OR if new discussions appeared in the window.
 
-**Known API limitation** : Notion search does NOT expose `mentioned_user_ids` nor `commented_by_user_ids` filters. Pages where I am mentioned in a comment OR edited by others are **NOT covered by automatic sweep**. Name-based search (e.g. searching for a first name) is **explicitly excluded** as a deterministic filter — it produces noise from homonyms in any non-trivial workspace. Fallback for these cases : `/capture <notion_url>` manually when you know a page concerns you without being its creator.
+**Known API limitation** : Notion search does NOT expose `mentioned_user_ids` nor `commented_by_user_ids` filters. Pages where I am mentioned in a comment OR edited by others are **NOT covered by the `created_by` filter** nor by `tracked_databases` (which only matches direct children of a DB, not nested sub-pages). Name-based search (e.g. searching for a first name) is **explicitly excluded** as a deterministic filter — it produces noise from homonyms in any non-trivial workspace. Fallback : `tracked_pages` for recurring handover pages, or `/capture <notion_url>` manually for one-shot captures.
 
 **API** : Notion MCP. Auth check at Step 0. Identity resolved via `user_handle.notion_user_id` in `.vault-config.yml` (resolved once via `notion-search query_type=user`, cached).
 
@@ -379,6 +380,7 @@ fetch_sources:
 
 notion:
   tracked_databases: []
+  tracked_pages: []                   # individual page IDs to monitor (handover pages, nested sub-pages)
 
 # No linear: section — assignee=me is sufficient, no extra config.
 

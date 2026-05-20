@@ -44,6 +44,8 @@ fetch_sources:
 # Per-source extras
 notion:
   tracked_databases: []               # explicit Notion DB IDs to sweep beyond mention/edit detection
+  tracked_pages: []                   # individual page IDs to monitor (handover pages where you're not the author, or nested sub-pages)
+                                      # format per entry: { id: "<page_uuid>", label: "<short name>", reason: "<why tracked>" }
 web:
   feeds: []                           # opt-in RSS URLs (no generic crawl)
 
