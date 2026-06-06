@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <i>An AI-maintained personal knowledge vault — second brain and code context layer for AI-assisted development</i>
+  <i>An AI-maintained personal knowledge vault, second brain and code context layer for AI-assisted development</i>
 </p>
 
 ---
