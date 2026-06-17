@@ -6,11 +6,10 @@
 # Produit UNE PR vault-sync/<date>-daily (notes atomiques du jour, sources + reasoning),
 # puis DM le lien + un résumé. Review humaine via la PR. Fidélité stricte (cf. SKILL.md).
 #
-# Anti-doublon : la fenêtre traverse minuit, donc on ne se base PAS sur un stamp "jour" (qui
-# relancerait le matin J+1 après un run le soir J). On utilise un MIN-INTERVAL de 16h : tant
-# que le dernier run date de moins de 16h, on skip. → 1 run par cycle ~24h, zéro doublon.
-# Le curseur last_ingest (dans /daily-ingest) garantit qu'aucun contenu n'est perdu, quelle
-# que soit l'heure réelle du run.
+# Priorité SOIR : le run du jour se fait le soir (18:00-23:59, soirée = aujourd'hui). Le matin
+# (00:00-09:00) ne RATTRAPE que la soirée d'HIER si elle a été ratée (Mac fermé le soir). Le stamp
+# = date de la dernière soirée traitée → pas de doublon soir/matin, rythme calé sur le soir.
+# Le curseur last_ingest (dans /daily-ingest) garantit qu'aucun contenu n'est perdu.
 #
 # Usage :
 #   run-daily-ingest.sh            # = auto (launchd)
@@ -23,11 +22,11 @@ MODE="${1:-auto}"
 VAULT="<vault>"
 TOOLS="$VAULT/tools"
 LOG="$VAULT/log.md"
-STAMP="$TOOLS/.daily-ingest-laststamp"   # epoch (date +%s) du dernier run
+STAMP="$TOOLS/.daily-ingest-laststamp"   # date (YYYY-MM-DD) de la dernière soirée traitée
 HOLIDAYS="$TOOLS/fr-holidays.txt"
 TODAY="$(date +%F)"
 DOW="$(date +%u)"          # 1=lundi … 7=dimanche
-MIN_GAP=57600             # 16h en secondes — anti-doublon sur la fenêtre traversant minuit
+TARGET="$TODAY"            # soirée cible (réassignée en auto: soir=aujourd'hui, matin=hier)
 
 # launchd démarre avec un PATH minimal : on rend claude/node trouvables.
 export PATH="/opt/homebrew/bin:/usr/local/bin:$HOME/.local/bin:$HOME/.npm-global/bin:/usr/bin:/bin"
@@ -39,18 +38,20 @@ logline () { echo "$TODAY | daily-ingest($MODE) | $1" >> "$LOG"; }
 if [[ "$MODE" != "manual" ]]; then
   # 1. week-end → stop (bilan des jours ouvrés)
   [[ "$DOW" -ge 6 ]] && exit 0
-  # 1bis. fenêtre 18:00→09:00 (traverse minuit). Hors fenêtre = entre 09:00 et 18:00 → stop.
+  # 1bis. soirée-cible (priorité soir). soir 18:00-23:59 → soirée d'aujourd'hui ;
+  #       matin 00:00-09:00 → rattrapage de la soirée d'HIER (seulement si elle a été ratée) ;
+  #       09:01-17:59 → hors fenêtre, stop.
   NOW="$((10#$(date +%H%M)))"
-  { [[ "$NOW" -ge 900 ]] && [[ "$NOW" -lt 1800 ]]; } && exit 0
-  # 2. jour férié FR → stop
-  [[ -f "$HOLIDAYS" ]] && grep -qx "$TODAY" "$HOLIDAYS" && exit 0
+  if   [[ "$NOW" -ge 1800 ]]; then TARGET="$TODAY"
+  elif [[ "$NOW" -le 900 ]];  then TARGET="$(date -v-1d +%F 2>/dev/null || date -d 'yesterday' +%F)"
+  else exit 0
+  fi
+  # 2. jour férié FR (sur la soirée cible) → stop
+  [[ -f "$HOLIDAYS" ]] && grep -qx "$TARGET" "$HOLIDAYS" && exit 0
   # 2bis. OOO (vault en pause) → stop
   grep -qE '^[[:space:]]*paused:[[:space:]]*true' "$VAULT/.vault-state.yml" 2>/dev/null && exit 0
-  # 3. déjà tourné dans les 16h → stop (anti-doublon soir/matin)
-  if [[ -f "$STAMP" ]]; then
-    gap=$(( $(date +%s) - $(cat "$STAMP" 2>/dev/null || echo 0) ))
-    [[ "$gap" -lt "$MIN_GAP" ]] && exit 0
-  fi
+  # 3. soirée cible déjà traitée → stop (le soir prime ; le matin ne rattrape que si le soir a été raté)
+  [[ -f "$STAMP" && "$(cat "$STAMP" 2>/dev/null)" == "$TARGET" ]] && exit 0
   # 4. hors-ligne → stop SANS marquer (réessaie au prochain tick)
   if ! ping -c1 -t3 1.1.1.1 >/dev/null 2>&1 && ! curl -fsS --max-time 4 https://slack.com -o /dev/null 2>&1; then
     exit 0
@@ -74,8 +75,8 @@ Self-DM UNIQUEMENT. Si rien de neuf à ingérer, ne crée pas de PR et ne DM rie
 
 OUT="$("$CLAUDE_BIN" -p "$PROMPT" --dangerously-skip-permissions 2>&1)"; RC=$?
 
-# Marque l'epoch du run (anti-doublon 16h + « déjà fait »).
-date +%s > "$STAMP"
+# Marque la soirée cible comme traitée (anti-doublon soir/matin).
+echo "$TARGET" > "$STAMP"
 
 if [[ $RC -ne 0 ]]; then
   logline "FAILED rc=$RC"
