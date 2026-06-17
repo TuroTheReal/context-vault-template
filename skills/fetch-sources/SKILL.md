@@ -24,6 +24,7 @@ Sweep all enabled sources in `<vault>/.vault-config.yml`, capture what's new sin
 All optional :
 
 - `--since <YYYY-MM-DD | ISO datetime>` — override the per-source high-water mark, force fetch from that point
+- `--cursor <name>` — use a NAMED high-water mark `last_<name>.<source>` instead of the default `last_fetch.<source>`. Lets a second consumer keep its own window without stealing the digest's (e.g. `/daily-ingest` runs `--cursor ingest` → `last_ingest.<source>`). Default: `fetch`. Reads + advances only the named cursor. With a non-default cursor, the `--summary full` file is `digest/<date>-<name>-summary.md` so it never clobbers the digest's `<date>-fetch-summary.md`.
 - `--until <YYYY-MM-DD | ISO datetime>` — cap the fetch at that point (default: now)
 - `--sources <comma-separated>` — limit to a subset (e.g. `--sources slack,notion`). Default: all sources with `fetch_sources.<type>: true` in config
 - `--except <comma-separated>` — exclude one or more sources (e.g. `--except github_discussions,web`). Combine with `--sources` or alone.

@@ -11,6 +11,8 @@ This folder is **documentation only** — no install script, no symlinks. If you
 - [fetch-sources/](fetch-sources/SKILL.md) — batch capture across configured sources, writes a daily summary in `digest/`
 - [audit-vault/](audit-vault/SKILL.md) — flag stale notes, broken links, schema violations
 - [daily-digest/](daily-digest/SKILL.md) — consume the fetch summary + chat live → produce a curated digest (Brief + Inbox) in `journal/`
+- [daily-ingest/](daily-ingest/SKILL.md) — nightly auto-enrichment: consume the day's raws + your reasoning (chat transcripts) → synthesize via /ingest → ONE daily PR (vault-sync/<date>-daily); strictly factual (your words/actions only, zero deduction)
+- [linear-project-update/](linear-project-update/SKILL.md) — weekly project status update for a project you lead (Highlights/Lowlights/Focus), cross-checked against your tracker + git + PRs + vault; draft only, no auto-post. Linear-flavored example — adapt the tracker calls to your stack.
 
 ## Backlog (to document later)
 

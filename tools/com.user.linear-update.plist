@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.<user>.linear-update</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string><vault>/tools/run-linear-update.sh</string>
+    <string>auto</string>
+  </array>
+
+  <!-- Mardi uniquement, fenêtre 13:30→14:30, toutes les 15 min. Les gardes du wrapper
+       (déjà-fait cette semaine, offline, férié, OOO) font qu'il ne tourne qu'une fois,
+       à la première fenêtre online du mardi après-midi. Draft DM, relu et posté à la main. -->
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict><key>Weekday</key><integer>2</integer><key>Hour</key><integer>13</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Weekday</key><integer>2</integer><key>Hour</key><integer>13</integer><key>Minute</key><integer>45</integer></dict>
+    <dict><key>Weekday</key><integer>2</integer><key>Hour</key><integer>14</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Weekday</key><integer>2</integer><key>Hour</key><integer>14</integer><key>Minute</key><integer>15</integer></dict>
+    <dict><key>Weekday</key><integer>2</integer><key>Hour</key><integer>14</integer><key>Minute</key><integer>30</integer></dict>
+  </array>
+
+  <key>ProcessType</key>
+  <string>Background</string>
+
+  <key>StandardOutPath</key>
+  <string><vault>/tools/logs/linear-update.out.log</string>
+  <key>StandardErrorPath</key>
+  <string><vault>/tools/logs/linear-update.err.log</string>
+</dict>
+</plist>

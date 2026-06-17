@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.<user>.daily-ingest</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string><vault>/tools/run-daily-ingest.sh</string>
+    <string>auto</string>
+  </array>
+
+  <!-- Large fenetre 18:00->09:00 (soir+nuit+matin), poll 30 min. Les gardes du wrapper
+       (week-end, hors-fenetre, ferie, OOO, min-interval 16h anti-doublon, offline) font
+       qu il ne tourne qu une fois par cycle ~24h, des que le Mac est eveille dans la fenetre. -->
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict><key>Hour</key><integer>18</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Hour</key><integer>18</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Hour</key><integer>19</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Hour</key><integer>19</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Hour</key><integer>20</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Hour</key><integer>20</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Hour</key><integer>21</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Hour</key><integer>21</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Hour</key><integer>22</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Hour</key><integer>22</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Hour</key><integer>23</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Hour</key><integer>23</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Hour</key><integer>0</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Hour</key><integer>0</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Hour</key><integer>1</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Hour</key><integer>1</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Hour</key><integer>2</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Hour</key><integer>2</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Hour</key><integer>3</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Hour</key><integer>3</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Hour</key><integer>4</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Hour</key><integer>4</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Hour</key><integer>5</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Hour</key><integer>5</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Hour</key><integer>6</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Hour</key><integer>6</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Hour</key><integer>7</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Hour</key><integer>7</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Hour</key><integer>8</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Hour</key><integer>8</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Hour</key><integer>9</integer><key>Minute</key><integer>0</integer></dict>
+  </array>
+
+  <key>ProcessType</key>
+  <string>Background</string>
+
+  <key>StandardOutPath</key>
+  <string><vault>/tools/logs/daily-ingest.out.log</string>
+  <key>StandardErrorPath</key>
+  <string><vault>/tools/logs/daily-ingest.err.log</string>
+</dict>
+</plist>

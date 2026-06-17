@@ -18,7 +18,7 @@ Speakers Quill doesn't recognize stay as SPK-<id> in the transcript — manual
 find/replace in VSCode if needed.
 
 Usage:
-    python3 ~/Documents/alan-context/tools/qm-to-md.py [path_or_dir] [--force]
+    python3 <vault>/tools/qm-to-md.py [path_or_dir] [--force]
 
 If no path → processes all .qm in raw/meetings/ that don't have a matching .md.
 --force → regenerate even if .md exists.

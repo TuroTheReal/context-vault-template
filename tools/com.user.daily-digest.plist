@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.<user>.daily-digest</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string><vault>/tools/run-digest.sh</string>
+    <string>auto</string>
+  </array>
+
+  <!-- Réveille le job uniquement dans la fenêtre 08:00→09:30, toutes les 15 min.
+       Les gardes du wrapper (déjà-fait, offline, week-end, férié) font qu'il ne
+       tourne réellement qu'une fois, à la première fenêtre online. Hors de ces
+       heures, launchd ne lance rien. Un créneau manqué pendant la veille est
+       recollé au réveil, mais la garde horaire du wrapper le rejette s'il est
+       hors fenêtre. -->
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict><key>Hour</key><integer>8</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Hour</key><integer>8</integer><key>Minute</key><integer>15</integer></dict>
+    <dict><key>Hour</key><integer>8</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Hour</key><integer>8</integer><key>Minute</key><integer>45</integer></dict>
+    <dict><key>Hour</key><integer>9</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Hour</key><integer>9</integer><key>Minute</key><integer>15</integer></dict>
+    <dict><key>Hour</key><integer>9</integer><key>Minute</key><integer>30</integer></dict>
+  </array>
+
+  <key>ProcessType</key>
+  <string>Background</string>
+
+  <key>StandardOutPath</key>
+  <string><vault>/tools/logs/daily-digest.out.log</string>
+  <key>StandardErrorPath</key>
+  <string><vault>/tools/logs/daily-digest.err.log</string>
+</dict>
+</plist>
