@@ -78,6 +78,7 @@ Other prefixes (person-, area-) only when referenced in 5+ notes.
 title: [human-readable, Obsidian graph friendly]
 type: [project|decision|context]
 status: [active|done|superseded|reversed]
+tags: [topic/<domain>, people/<name>, ...]   # controlled taxonomy — see « Tags » below. Uncertain → omit, never guess.
 date: YYYY-MM-DD
 updated: YYYY-MM-DD
 author: [optional — who proposed/owns this]
@@ -90,6 +91,17 @@ raw: [raw/source/file-1.md]     # optional — local raw captures backing this n
 
 `sources:` is the truth: origin URLs (Slack thread, Notion page, GitHub PR, web article). Always present, at least one entry.
 `raw:` is optional: local files in `raw/` that cache these sources. Only present if raw captures exist for this note.
+
+### Tags — controlled taxonomy
+
+`tags:` is a flat list in the frontmatter, optimized for AI retrieval + Obsidian nested-tag graph. **Closed vocabulary — never invent a tag. If a dimension is uncertain, OMIT it (or mark `TBD`), never guess.** A tag must trace to the note's real content, same faithfulness rule as every claim.
+
+- `topic/<domain>` — the primary subject (e.g. `topic/billing`, `topic/infra`, `topic/security`). Keep a short closed list of your real domains; extend only when 3+ notes need a genuinely new one.
+- `people/<name>` — people who are **actors** of the note (decider, source, position-holder), not passing mentions. Lowercase first name (e.g. `people/alex`).
+- `country/<code>` — only when a country is the **subject**, not an incidental mention (e.g. `country/fr`).
+- `kind/<nature>` — `position` (note carries a `My position:` stance), `onboarding` (handover / ramp-up context).
+
+Multiple tags per axis are fine. When a note has no confident tag on an axis, leave that axis out entirely.
 
 ### Links — three distinct axes
 

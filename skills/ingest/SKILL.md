@@ -30,6 +30,7 @@ One of:
 Optional flags:
 - `--force-create` — bypass the « update existing note on same topic » detection. Use when you genuinely want a separate note despite topic overlap.
 - `--note <existing-note-path>` — explicitly target an existing note for update (skip the auto-detection).
+- `--no-pr` — write note + index + log + raw flip, then `git add` + `git commit` on the **current** branch only. Skip branch-switch, push, and PR (Step 10). Used by `/daily-ingest` to bundle many ingests into ONE daily PR — the caller owns branch creation + push + the single PR.
 
 ## Configuration read
 
@@ -90,6 +91,7 @@ Read `<vault>/CLAUDE.md` in full. Never operate from memory. The schema is the s
   - **Type** — `project-` (multi-ticket initiative), `decision-` (choice + tradeoff), `context-` (everything else: position, learning, gotcha, org context). Apply the « content > event » filter: if the source is logistics with no density, **abort the ingest** (leave the raw as `ingested: false`, consultable only).
   - **Atomicity check** — does this source contain ONE atomic idea, or several? If several → split into multiple ingestions (one per atomic idea). Never bundle.
   - **Candidate links** (impact/dependency only): which existing notes does this impact? Which does it depend on? Same topic ≠ link. `context-` notes never get linked.
+  - **Tags** — assign from the controlled taxonomy in `CLAUDE.md` (`topic/`, `people/`, `country/`, `kind/`). A tag must trace to real content. Uncertain on an axis → omit it (or `TBD`), never guess.
 
 **Faithfulness rule** — the synthesized note is a **factual summary** of the source. Never invent, infer beyond what the source states, or stylize. If a fact is not in the source, it does not go in the note. Same rule as CLAUDE.md « Note format » section. This is non-negotiable: a note that adds a fact not in its source is a bug, not a feature.
 
@@ -182,6 +184,8 @@ Read `<vault>/CLAUDE.md` in full. Never operate from memory. The schema is the s
 - One line per ingest. Append-only.
 
 ### Step 10 — git PR (if enabled)
+
+**`--no-pr` mode** (used by `/daily-ingest`): do `git add` + `git commit` on the **current** branch, then STOP. No `checkout -b`, no `push`, no `gh pr create`. The caller already created the day's branch and will push + open **one** PR covering all commits. Everything below (branch / push / PR) applies only WITHOUT `--no-pr`.
 
 If `<vault>/.vault-config.yml` `git_mode.notes: true`:
 
