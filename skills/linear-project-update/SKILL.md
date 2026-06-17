@@ -1,17 +1,21 @@
 ---
 name: linear-project-update
-description: Generate a weekly project status update for a Linear project you lead, in the crew's existing Highlights / Lowlights / Focus format. Cross-references Linear milestones + issues, git activity, PRs (gh), and the context vault, then double-checks every claim. Outputs a DRAFT to the vault and stdout — never auto-posts to Linear (confirm first, or pass --post). Triggers on "project update", "linear update", "weekly update for <project>", "status update for <project>", "génère mon update projet".
+description: Generate a weekly project status update for a Linear project you lead, in your team's existing Highlights / Lowlights / Focus format. Cross-references Linear milestones + issues, git activity, PRs (gh), and the context vault, then double-checks every claim. Outputs a DRAFT to the vault and stdout — never auto-posts to Linear (confirm first, or pass --post). Triggers on "project update", "linear update", "weekly update for <project>", "status update for <project>", "génère mon update projet".
 ---
 
 # /linear-project-update
 
 Generate your weekly **project** status update for a Linear project you lead. Mirrors the format of the project's existing status updates. Locally archived in the vault, no auto-send. Manually triggered, or fired by a weekly routine in draft mode.
 
-This is a **project** update (posted on a single project), not the aggregated **initiative** update (<colleague> owns that, it rolls several projects into one). Don't confuse the two.
+This is a **project** update (posted on a single project), not the aggregated **initiative** update (your lead owns that, it rolls several projects into one). Don't confuse the two.
+
+## Tracker — Linear is the example
+
+This skill uses **Linear** as the example project tracker, but the logic is **tracker-agnostic**: cross-reference your tracker (milestones + issues) + git + PRs + the vault → a status draft. To adapt, swap the Linear MCP calls (`get_project` / `list_issues` / `save_status_update`) for your tracker's equivalent (Jira, GitHub Projects, Asana, …). The skill name keeps `linear` as the concrete example.
 
 ## When to use
 
-- Weekly, before the crew's your-companyweek reporting cadence.
+- Weekly, before your team's weekly reporting cadence.
 - Any time you want a consolidated "what moved on project X since the last update".
 - Fired by the `linear-project-update` weekly routine (draft mode → Slack DM / vault).
 
@@ -26,7 +30,7 @@ This is a **project** update (posted on a single project), not the aggregated **
 - `<project>` (positional, optional) — Linear project name, slug, URL, or ID. If omitted: list projects where `lead = me` and ask which one. Never guess silently.
 - `--since <YYYY-MM-DD | ISO>` — override the time window. Default = `createdAt` of the project's latest status update; if none exists, last 7 days.
 - `--post` — after the draft + double-check, post the update to Linear via `save_status_update`. **Off by default.** Without it, the skill stops at the draft and asks for confirmation (no-action-without-ask).
-- `--lang <auto|en|fr>` — output language. Default `auto` = match the language of the latest existing status update (the crew writes these in English).
+- `--lang <auto|en|fr>` — output language. Default `auto` = match the language of the latest existing status update (your team writes these in English).
 
 ## Pipeline (precise steps)
 
@@ -63,7 +67,7 @@ Gather raw signal, then synthesize. Pull from all three sources:
 
 ### Step 3 — synthesize in the reference format
 
-Write the body mirroring Step 1's reference. Default format (crew standard) if no prior update:
+Write the body mirroring Step 1's reference. Default format (team standard) if no prior update:
 
 ```
 **✨ Highlights**
@@ -79,14 +83,14 @@ Write the body mirroring Step 1's reference. Default format (crew standard) if n
 *Pending:*
 * <blocked / not-yet-dug-into items, deferred scope, cancelled work worth flagging>
 
-**🎯 Focus for this your-companyweek**
+**🎯 Focus for this week**
 
 *Ship:*
 * <next concrete steps, tied to the current milestone>
 ```
 
 Rules:
-- Concise, factual, your voice (short, technical, no fluff, no AI polish — <colleague> has flagged AI-written tone before). Keep technical terms in English.
+- Concise, factual, your voice (short, technical, no fluff, no AI polish). Keep technical terms in English.
 - **No em dash.** Use commas, colons, periods. (When mirroring a prior update that used em dashes, still drop them.)
 - Reference issues/PRs the way the prior update did (e.g. `<org>/<repo>#96919` linkifies on Linear).
 - Don't restate the milestone % diff (Linear adds it).
