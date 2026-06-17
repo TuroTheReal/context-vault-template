@@ -207,7 +207,7 @@ The terminal output is a **summary** for fast triage. Counts per check + first 3
 
 📋 First findings (use --output markdown for full report + suggested actions)
   stale-notes:
-    - notes/project-cloudflare-migration.md (97 days ago)
+    - notes/project-example.md (97 days ago)
     - notes/project-iac-drift.md (97 days ago)
   orphan-notes:
     - notes/project-finops-automation.md
@@ -228,15 +228,15 @@ Example markdown excerpt:
 ```markdown
 ## stale-notes (2 findings)
 
-### notes/project-cloudflare-migration.md
+### notes/project-example.md
 - Last updated: 2026-04-21 (97 days ago)
 - Status: active
-- **Suggested action**: `/ingest --note notes/project-cloudflare-migration.md` to refresh from current source, or update `status:` to `done` / supersede if outdated.
+- **Suggested action**: `/ingest --note notes/project-example.md` to refresh from current source, or update `status:` to `done` / supersede if outdated.
 
 ### notes/project-iac-drift.md
 - Last updated: 2026-04-21 (97 days ago)
 - Status: active
-- **Suggested action**: same as above. Cross-check with linked notes (project-cloudflare-migration) for consistency.
+- **Suggested action**: same as above. Cross-check with linked notes (project-example) for consistency.
 ```
 
 Usage:

@@ -10,7 +10,8 @@ vault_path: /path/to/your/context-vault
 # Adapt to your stack: Slack OR Discord OR Teams, GitHub OR GitLab, Notion OR Confluence, etc.
 user_handle:
   slack: "@your.handle"               # display handle
-  slack_user_id: "U00000000"          # Slack ID (used by /daily-digest for self-DM target if cron added later)
+  slack_user_id: "U00000000"          # Slack ID (used by /daily-digest + launchd agents for self-DM target)
+  slack_dm_id: "D00000000"            # Slack self-DM channel ID (target for the launchd wrappers' self-DMs)
   github: "your-github-username"      # or GitLab/Bitbucket equivalent
   github_org: "your-org"              # --owner scope for gh search (excludes personal repos from the sweep)
   github_repo_exclude:                # additional client-side filter after pull (catch repos that slipped --owner)
