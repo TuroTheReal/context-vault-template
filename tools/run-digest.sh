@@ -35,7 +35,7 @@ if [[ "$MODE" != "manual" ]]; then
   # 1bis. hors fenêtre 08:00–09:35 → stop (fenêtre du matin, pas toute la journée ;
   #       protège aussi contre un job launchd recollé tard après une veille)
   NOW_HM="$(date +%H%M)"
-  { [[ "$NOW_HM" < "0800" ]] || [[ "$NOW_HM" > "0935" ]]; } && exit 0
+  { [[ "$((10#$NOW_HM))" -lt 800 ]] || [[ "$((10#$NOW_HM))" -gt 935 ]]; } && exit 0
   # 2. jour férié FR → stop
   [[ -f "$HOLIDAYS" ]] && grep -qx "$TODAY" "$HOLIDAYS" && exit 0
   # 2bis. OOO (vault en pause) → stop
