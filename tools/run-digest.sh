@@ -27,7 +27,7 @@ export PATH="/opt/homebrew/bin:/usr/local/bin:$HOME/.local/bin:$HOME/.npm-global
 CLAUDE_BIN="$(command -v claude || true)"
 
 notify ()  { osascript -e "display notification \"$2\" with title \"$1\"" >/dev/null 2>&1 || true; }
-logline () { echo "$TODAY | daily-digest($MODE) | $1" >> "$LOG"; }
+logline () { echo "$TODAY | daily-digest($MODE) | $1" >> "$TOOLS/logs/runs.log"; }
 
 if [[ "$MODE" != "manual" ]]; then
   # 1. week-end → stop
@@ -58,22 +58,27 @@ cd "$VAULT" || { logline "FAILED: cd vault impossible"; exit 0; }
 
 PROMPT='/daily-digest
 
-Une fois le digest persisté sur disque, envoie le markdown complet du digest en DM Slack à moi-même (SLACK_USER_ID <user_handle.slack_user_id>). Self-DM UNIQUEMENT — ne l'\''envoie à personne d'\''autre ni dans un canal.'
+Une fois le digest persisté sur disque, envoie le markdown complet du digest en DM Slack à moi-même (SLACK_USER_ID <user_handle.slack_user_id>) — ENVOI réel avec slack_send_message, JAMAIS un draft (pas slack_send_message_draft), et UNIQUEMENT ce self-DM (jamais un canal ni personne d'\''autre). Self-DM UNIQUEMENT — ne l'\''envoie à personne d'\''autre ni dans un canal.'
 
 OUT="$("$CLAUDE_BIN" -p "$PROMPT" --dangerously-skip-permissions 2>&1)"; RC=$?
 
-# Marque le jour comme fait (évite que le poll relance après un run réussi).
-echo "$TODAY" > "$STAMP"
-
 if [[ $RC -ne 0 ]]; then
-  logline "FAILED rc=$RC"
-  notify "Daily digest KO" "Échec du run (code $RC) — voir the-vault/log.md"
+  printf '%s\n' "$OUT" > "$TOOLS/logs/daily-digest.last-fail.log"
+  if grep -qiE 'API Error|Stream idle|timeout|overloaded|rate.?limit' <<<"$OUT"; then
+    logline "FAILED rc=$RC (API/timeout — retry au prochain tick)"
+  else
+    logline "FAILED rc=$RC (voir logs/daily-digest.last-fail.log)"
+  fi
+  notify "Daily digest KO" "Échec (code $RC) — retry au prochain tick"
   exit 0
 fi
 if grep -qiE 'auth.*(expir|fail|required)|unauthenticated|not authenticated' <<<"$OUT"; then
+  printf '%s\n' "$OUT" > "$TOOLS/logs/daily-digest.last-fail.log"
   logline "auth-error MCP"
   notify "Daily digest" "Un MCP semble déconnecté — re-auth nécessaire"
   exit 0
 fi
 
+# Succès uniquement : marque le jour (un échec ne marque rien → le poll re-tente dans la fenêtre)
+echo "$TODAY" > "$STAMP"
 logline "ok"

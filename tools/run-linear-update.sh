@@ -27,7 +27,7 @@ export PATH="/opt/homebrew/bin:/usr/local/bin:$HOME/.local/bin:$HOME/.npm-global
 CLAUDE_BIN="$(command -v claude || true)"
 
 notify ()  { osascript -e "display notification \"$2\" with title \"$1\"" >/dev/null 2>&1 || true; }
-logline () { echo "$TODAY | linear-update($MODE) | $1" >> "$LOG"; }
+logline () { echo "$TODAY | linear-update($MODE) | $1" >> "$TOOLS/logs/runs.log"; }
 
 if [[ "$MODE" != "manual" ]]; then
   # 1. mardi uniquement → stop sinon
@@ -57,22 +57,27 @@ cd "$VAULT" || { logline "FAILED: cd vault impossible"; exit 0; }
 
 PROMPT='/linear-project-update <example-project-slug>
 
-NE PUBLIE PAS sur Linear (aucun save_status_update). Génère uniquement le DRAFT, puis envoie le markdown complet du draft en DM Slack à moi-même (SLACK_USER_ID <user_handle.slack_user_id>). Self-DM UNIQUEMENT — ne l'\''envoie à personne d'\''autre ni dans un canal.'
+NE PUBLIE PAS sur Linear (aucun save_status_update). Génère uniquement le DRAFT, puis envoie le markdown complet du draft en DM Slack à moi-même (SLACK_USER_ID <user_handle.slack_user_id>) — ENVOI réel avec slack_send_message, JAMAIS un draft (pas slack_send_message_draft), et UNIQUEMENT ce self-DM (jamais un canal ni personne d'\''autre). Self-DM UNIQUEMENT — ne l'\''envoie à personne d'\''autre ni dans un canal.'
 
 OUT="$("$CLAUDE_BIN" -p "$PROMPT" --dangerously-skip-permissions 2>&1)"; RC=$?
 
-# Marque la semaine comme faite (évite que le poll relance après un run réussi).
-echo "$WEEK" > "$STAMP"
-
 if [[ $RC -ne 0 ]]; then
-  logline "FAILED rc=$RC"
-  notify "Linear update KO" "Échec du run (code $RC) — voir the-vault/log.md"
+  printf '%s\n' "$OUT" > "$TOOLS/logs/linear-update.last-fail.log"
+  if grep -qiE 'API Error|Stream idle|timeout|overloaded|rate.?limit' <<<"$OUT"; then
+    logline "FAILED rc=$RC (API/timeout — retry au prochain tick)"
+  else
+    logline "FAILED rc=$RC (voir logs/linear-update.last-fail.log)"
+  fi
+  notify "Linear update KO" "Échec (code $RC) — retry au prochain tick"
   exit 0
 fi
 if grep -qiE 'auth.*(expir|fail|required)|unauthenticated|not authenticated' <<<"$OUT"; then
+  printf '%s\n' "$OUT" > "$TOOLS/logs/linear-update.last-fail.log"
   logline "auth-error MCP"
   notify "Linear update" "Un MCP semble déconnecté — re-auth nécessaire"
   exit 0
 fi
 
+# Succès uniquement : marque la semaine (un échec ne marque rien → le poll re-tente)
+echo "$WEEK" > "$STAMP"
 logline "ok"

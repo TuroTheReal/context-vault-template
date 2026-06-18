@@ -33,7 +33,7 @@ export PATH="/opt/homebrew/bin:/usr/local/bin:$HOME/.local/bin:$HOME/.npm-global
 CLAUDE_BIN="$(command -v claude || true)"
 
 notify ()  { osascript -e "display notification \"$2\" with title \"$1\"" >/dev/null 2>&1 || true; }
-logline () { echo "$TODAY | daily-ingest($MODE) | $1" >> "$LOG"; }
+logline () { echo "$TODAY | daily-ingest($MODE) | $1" >> "$TOOLS/logs/runs.log"; }
 
 if [[ "$MODE" != "manual" ]]; then
   # 1. week-end → stop (bilan des jours ouvrés)
@@ -68,25 +68,33 @@ cd "$VAULT" || { logline "FAILED: cd vault impossible"; exit 0; }
 
 PROMPT='/daily-ingest
 
-Une fois la PR vault-sync créée, envoie en DM Slack à moi-même (SLACK_USER_ID <user_handle.slack_user_id>) :
+Une fois la PR vault-sync créée, envoie en DM Slack à moi-même (SLACK_USER_ID <user_handle.slack_user_id>) — ENVOI réel avec slack_send_message, JAMAIS un draft (pas slack_send_message_draft), et UNIQUEMENT ce self-DM (jamais un canal ni personne d'\''autre) :
 1. le lien de la PR ;
 2. un résumé : nombre de notes créées / mises à jour, puis une ligne par note au format « ✏️ created|updated <note-name> — <résumé 1 ligne> ».
 Self-DM UNIQUEMENT. Si rien de neuf à ingérer, ne crée pas de PR et ne DM rien.'
 
 OUT="$("$CLAUDE_BIN" -p "$PROMPT" --dangerously-skip-permissions 2>&1)"; RC=$?
 
-# Marque la soirée cible comme traitée (anti-doublon soir/matin).
-echo "$TARGET" > "$STAMP"
+# Filet : /ingest a pu laisser le repo sur une branche vault-sync → revenir sur main.
+git -C "$VAULT" checkout main >/dev/null 2>&1 || true
 
 if [[ $RC -ne 0 ]]; then
-  logline "FAILED rc=$RC"
-  notify "Daily ingest KO" "Échec du run (code $RC) — voir the-vault/log.md"
+  printf '%s\n' "$OUT" > "$TOOLS/logs/daily-ingest.last-fail.log"
+  if grep -qiE 'API Error|Stream idle|timeout|overloaded|rate.?limit' <<<"$OUT"; then
+    logline "FAILED rc=$RC (API/timeout — retry au prochain tick)"
+  else
+    logline "FAILED rc=$RC (voir logs/daily-ingest.last-fail.log)"
+  fi
+  notify "Daily ingest KO" "Échec (code $RC) — retry au prochain tick"
   exit 0
 fi
 if grep -qiE 'auth.*(expir|fail|required)|unauthenticated|not authenticated' <<<"$OUT"; then
+  printf '%s\n' "$OUT" > "$TOOLS/logs/daily-ingest.last-fail.log"
   logline "auth-error MCP"
   notify "Daily ingest" "Un MCP semble déconnecté — re-auth nécessaire"
   exit 0
 fi
 
+# Succès uniquement : marque la soirée cible (un échec ne marque rien → le poll re-tente)
+echo "$TARGET" > "$STAMP"
 logline "ok"
