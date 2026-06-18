@@ -21,7 +21,6 @@ MODE="${1:-auto}"
 
 VAULT="<vault>"
 TOOLS="$VAULT/tools"
-LOG="$VAULT/log.md"
 STAMP="$TOOLS/.daily-ingest-laststamp"   # date (YYYY-MM-DD) de la dernière soirée traitée
 HOLIDAYS="$TOOLS/fr-holidays.txt"
 TODAY="$(date +%F)"

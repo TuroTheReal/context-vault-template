@@ -15,7 +15,6 @@ MODE="${1:-auto}"
 
 VAULT="<vault>"
 TOOLS="$VAULT/tools"
-LOG="$VAULT/log.md"
 STAMP="$TOOLS/.linear-update-laststamp"
 HOLIDAYS="$TOOLS/fr-holidays.txt"
 TODAY="$(date +%F)"        # YYYY-MM-DD
