@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# run-audit.sh — lance /audit-vault une fois par semaine (dimanche 09:00-10:30), la première
+# run-audit.sh — lance /audit-vault une fois par semaine (vendredi 14:00-16:00), la première
 # fois que le Mac est réveillé ET connecté. Déclenché par launchd (mode "auto", poll 15 min)
 # ou à la main (mode "manual", bypass des gardes).
 #
@@ -31,12 +31,12 @@ notify ()  { osascript -e "display notification \"$2\" with title \"$1\"" >/dev/
 logline () { echo "$TODAY | audit($MODE) | $1" >> "$TOOLS/logs/runs.log"; }
 
 if [[ "$MODE" != "manual" ]]; then
-  # 1. dimanche uniquement → stop sinon
-  [[ "$DOW" -ne 7 ]] && exit 0
-  # 1bis. hors fenêtre 09:00–10:30 → stop (protège aussi un job recollé tard après veille)
+  # 1. vendredi uniquement → stop sinon
+  [[ "$DOW" -ne 5 ]] && exit 0
+  # 1bis. hors fenêtre 14:00–16:00 → stop (protège aussi un job recollé tard après veille)
   NOW_HM="$(date +%H%M)"
-  { [[ "$((10#$NOW_HM))" -lt 900 ]] || [[ "$((10#$NOW_HM))" -gt 1030 ]]; } && exit 0
-  # 2. OOO (vault en pause) → stop. Pas de garde jour-férié : l'hygiène tourne le dimanche.
+  { [[ "$((10#$NOW_HM))" -lt 1400 ]] || [[ "$((10#$NOW_HM))" -gt 1600 ]]; } && exit 0
+  # 2. OOO (vault en pause) → stop. Pas de garde jour-férié : l'hygiène tourne le vendredi.
   grep -qE '^[[:space:]]*paused:[[:space:]]*true' "$VAULT/.vault-state.yml" 2>/dev/null && exit 0
   # 3. déjà tourné cette semaine → stop
   [[ -f "$STAMP" && "$(cat "$STAMP" 2>/dev/null)" == "$WEEK" ]] && exit 0
