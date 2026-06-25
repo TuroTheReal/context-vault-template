@@ -41,7 +41,7 @@ if [[ "$MODE" != "manual" ]]; then
   # 3. déjà tourné cette semaine → stop
   [[ -f "$STAMP" && "$(cat "$STAMP" 2>/dev/null)" == "$WEEK" ]] && exit 0
   # 4. hors-ligne → stop SANS marquer la semaine (réessaie au prochain tick)
-  if ! ping -c1 -t3 1.1.1.1 >/dev/null 2>&1 && ! curl -fsS --max-time 4 https://slack.com -o /dev/null 2>&1; then
+  if ! curl -fsS --max-time 5 https://www.google.com -o /dev/null 2>&1; then
     exit 0
   fi
 fi

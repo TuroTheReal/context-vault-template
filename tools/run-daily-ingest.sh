@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # run-daily-ingest.sh — lance /daily-ingest une fois par cycle (~24h), jours ouvrés, sur une
-# LARGE fenêtre soir→matin 18:00→09:00 (au cas où le Mac n'est pas réveillé entre 20-21h).
+# LARGE fenêtre soir→matin 18:00→10:00 (au cas où le Mac n'est pas réveillé entre 20-21h).
 # Déclenché par launchd (mode "auto", poll 30 min) ou à la main (mode "manual", bypass gardes).
 #
 # Produit UNE PR vault-sync/<date>-daily (notes atomiques du jour, sources + reasoning),
 # puis DM le lien + un résumé. Review humaine via la PR. Fidélité stricte (cf. SKILL.md).
 #
 # Priorité SOIR : le run du jour se fait le soir (18:00-23:59, soirée = aujourd'hui). Le matin
-# (00:00-09:00) ne RATTRAPE que la soirée d'HIER si elle a été ratée (Mac fermé le soir). Le stamp
+# (00:00-10:00) ne RATTRAPE que la soirée d'HIER si elle a été ratée (Mac fermé le soir). Le stamp
 # = date de la dernière soirée traitée → pas de doublon soir/matin, rythme calé sur le soir.
 # Le curseur last_ingest (dans /daily-ingest) garantit qu'aucun contenu n'est perdu.
 #
@@ -38,11 +38,11 @@ if [[ "$MODE" != "manual" ]]; then
   # 1. week-end → stop (bilan des jours ouvrés)
   [[ "$DOW" -ge 6 ]] && exit 0
   # 1bis. soirée-cible (priorité soir). soir 18:00-23:59 → soirée d'aujourd'hui ;
-  #       matin 00:00-09:00 → rattrapage de la soirée d'HIER (seulement si elle a été ratée) ;
+  #       matin 00:00-10:00 → rattrapage de la soirée d'HIER (seulement si elle a été ratée) ;
   #       09:01-17:59 → hors fenêtre, stop.
   NOW="$((10#$(date +%H%M)))"
   if   [[ "$NOW" -ge 1800 ]]; then TARGET="$TODAY"
-  elif [[ "$NOW" -le 900 ]];  then TARGET="$(date -v-1d +%F 2>/dev/null || date -d 'yesterday' +%F)"
+  elif [[ "$NOW" -le 1000 ]];  then TARGET="$(date -v-1d +%F 2>/dev/null || date -d 'yesterday' +%F)"
   else exit 0
   fi
   # 2. jour férié FR (sur la soirée cible) → stop
@@ -52,7 +52,7 @@ if [[ "$MODE" != "manual" ]]; then
   # 3. soirée cible déjà traitée → stop (le soir prime ; le matin ne rattrape que si le soir a été raté)
   [[ -f "$STAMP" && "$(cat "$STAMP" 2>/dev/null)" == "$TARGET" ]] && exit 0
   # 4. hors-ligne → stop SANS marquer (réessaie au prochain tick)
-  if ! ping -c1 -t3 1.1.1.1 >/dev/null 2>&1 && ! curl -fsS --max-time 4 https://slack.com -o /dev/null 2>&1; then
+  if ! curl -fsS --max-time 5 https://www.google.com -o /dev/null 2>&1; then
     exit 0
   fi
 fi

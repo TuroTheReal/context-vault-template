@@ -12,7 +12,7 @@
     <string>auto</string>
   </array>
 
-  <!-- Large fenetre 18:00->09:00 (soir+nuit+matin), poll 30 min. Les gardes du wrapper
+  <!-- Large fenetre 18:00->10:00 (soir+nuit+matin), poll 30 min. Les gardes du wrapper
        (week-end, hors-fenetre, ferie, OOO, min-interval 16h anti-doublon, offline) font
        qu il ne tourne qu une fois par cycle ~24h, des que le Mac est eveille dans la fenetre. -->
   <key>StartCalendarInterval</key>
@@ -48,6 +48,8 @@
     <dict><key>Hour</key><integer>8</integer><key>Minute</key><integer>0</integer></dict>
     <dict><key>Hour</key><integer>8</integer><key>Minute</key><integer>30</integer></dict>
     <dict><key>Hour</key><integer>9</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Hour</key><integer>9</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Hour</key><integer>10</integer><key>Minute</key><integer>0</integer></dict>
   </array>
 
   <key>ProcessType</key>
