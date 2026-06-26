@@ -30,3 +30,12 @@ jobs:
       - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  neutralization:
+    name: neutralized
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: no real identifiers in operational files
+        run: bash .github/check-neutralized.sh
