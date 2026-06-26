@@ -22,3 +22,7 @@ journal/*-digest.md
 *~
 .idea/
 .vscode/
+
+# Private neutralization patterns (your own company / name markers) — local only,
+# read by .github/check-neutralized.sh; keeps the public template neutral.
+.github/neutralize-extra.txt

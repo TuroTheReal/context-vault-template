@@ -3,8 +3,10 @@
 # bootstrap.sh — initialize a context vault from this template.
 #
 # Turns a fresh clone of this template into a working vault: creates the local
-# config/state files, fills the one deterministic value (vault_path), and wires
-# the skills into Claude Code so they are discoverable. Personal handles and the
+# config/state files, fills the one deterministic value (vault_path), wires the
+# skills into Claude Code, and drops the template's maintainer-only CI (the
+# neutralization guard is for the public template, not your private instance).
+# Personal handles and the
 # source toggles stay a manual edit (a handful of one-time fields) — this script
 # does the mechanical toil, not the personal choices.
 #
@@ -117,6 +119,15 @@ for skill_dir in "$TARGET"/skills/*/; do
   fi
 done
 ok "$linked skill(s) linked"
+
+# --- 2b. drop template-maintainer tooling (this is a private instance now) ---
+step "Template tooling"
+if [[ -d "$TARGET/.github" ]]; then
+  rm -rf "$TARGET/.github"
+  ok "removed .github/ (neutralization guard + template CI are maintainer-only)"
+else
+  info ".github/ already absent"
+fi
 
 # --- 3. optional automation layer (macOS launchd) ----------------------------
 if [[ "$WITH_AUTOMATION" == true ]]; then
