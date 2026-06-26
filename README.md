@@ -6,7 +6,7 @@
   <img src="https://img.shields.io/badge/Claude_Code-Anthropic-6B4FBB?logo=anthropic&logoColor=white"/>
   <img src="https://img.shields.io/badge/Markdown-000000?logo=markdown&logoColor=white"/>
   <img src="https://img.shields.io/badge/YAML-CB171E?logo=yaml&logoColor=white"/>
-  <img src="https://img.shields.io/badge/License-MIT-yellow.svg"/>
+  <img src="https://img.shields.io/badge/License-CC%20BY%204.0-yellow.svg"/>
 </p>
 
 <p align="center">
@@ -98,6 +98,7 @@ The vault is built around three core concepts and three distinct link axes.
 ```
 context-vault-template/
 ├── CLAUDE.md                       # Vault schema (rules, frontmatter, ingestion flow)
+├── bootstrap.sh                    # One-shot init: config + skills wiring (+ optional launchd)
 ├── .vault-config.yml.example       # Static config template
 ├── .vault-state.yml.example        # Dynamic state template
 ├── .gitignore                      # OS / Obsidian / state files excluded
@@ -105,19 +106,17 @@ context-vault-template/
 ├── log.md                          # Append-only audit trail (empty at bootstrap)
 ├── notes/                          # Synthesized notes (atomic, typed, sourced)
 ├── raw/                            # Captured raw sources (full or stub)
-│   ├── slack/
-│   ├── notion/
-│   ├── github/
-│   ├── meetings/
-│   ├── web/
+│   ├── slack/  notion/  github/  github_discussions/
+│   ├── linear/  meetings/  web/
 │   └── claude/                     # Claude conversation captures
+├── digest/                         # /fetch-sources summaries (gitignored artifacts)
+├── journal/                        # /daily-digest output (gitignored artifacts)
 ├── audit/                          # /audit-vault reports (artifacts, gitignored)
 │   └── README.md
-└── skills/                         # 4 operational skills documented as SKILL.md
-    ├── capture/
-    ├── ingest/
-    ├── fetch-sources/
-    └── audit-vault/
+├── tools/                          # cron wrappers (run-*.sh) + launchd plists
+└── skills/                         # 7 operational skills, each a Claude Code SKILL.md
+    ├── capture/  ingest/  fetch-sources/  audit-vault/
+    └── daily-digest/  daily-ingest/  linear-project-update/
 ```
 
 ---
@@ -135,27 +134,26 @@ context-vault-template/
 
 ## 🚀 Quick Start
 
-This template is **documentation only** — the skills are not pre-installed.
+The skills ship ready to run (Claude Code reads each `SKILL.md` directly). `bootstrap.sh` does the mechanical setup, you fill the personal values.
 
 ```bash
-# 1. Clone or copy this directory as the base for your private vault
+# 1. Clone this template as the base for your private vault
 git clone https://github.com/TuroTheReal/context-vault-template.git my-vault
 cd my-vault
 
-# 2. Bootstrap config files
-cp .vault-config.yml.example .vault-config.yml
-cp .vault-state.yml.example .vault-state.yml
+# 2. Run the bootstrap: creates .vault-config.yml / .vault-state.yml,
+#    auto-fills vault_path, and symlinks the skills into ~/.claude/skills
+./bootstrap.sh
+#    add --with-automation to also install the launchd cron agents (macOS)
 
-# 3. Edit .vault-config.yml — fill in your handles, paths, enabled sources
-
-# 4. Make your vault repo private (it will contain personal context)
+# 3. Make your vault repo private (it will contain personal context)
 ```
 
-Then:
+Then fill the personal values (by hand, or ask your AI assistant to do it):
 
-1. **Read** `CLAUDE.md` — the schema your AI assistant will follow.
-2. **Read** the 4 SKILL.md files in `skills/` to understand each verb's behavior.
-3. **Implement** the skills as logic (bash / python / your choice). The SKILL.md files are specs — they describe behavior precisely but contain no executable code.
+1. **Read** `CLAUDE.md`, the schema your AI assistant follows.
+2. **Edit** `.vault-config.yml`: your `user_handle.*` and the `fetch_sources` toggles for the sources you actually use. The `notion_user_id` / `linear_user_id` UUIDs resolve themselves on the first fetch (or ask the AI to resolve them via MCP).
+3. **Connect** one MCP server per enabled source, then try `/fetch-sources` and `/ingest <url>`.
 
 ---
 
@@ -212,7 +210,7 @@ Every piece of knowledge in the vault traces back to an external source via this
 
 ## 🛠️ Skills
 
-Four operational skills, each documented in `skills/<name>/SKILL.md`:
+Seven operational skills, each a Claude Code skill in `skills/<name>/SKILL.md` (run as-is, no implementation needed):
 
 | Skill | Purpose |
 |-------|---------|
@@ -220,8 +218,11 @@ Four operational skills, each documented in `skills/<name>/SKILL.md`:
 | [`/ingest <URL \| raw>`](skills/ingest/SKILL.md) | Synthesize a source into a vault note |
 | [`/fetch-sources`](skills/fetch-sources/SKILL.md) | Batch capture across configured sources (idempotent, high-water mark per source) |
 | [`/audit-vault`](skills/audit-vault/SKILL.md) | Health check — stale notes, broken links, schema violations |
+| [`/daily-digest`](skills/daily-digest/SKILL.md) | Daily brief and actionable inbox from the day's activity |
+| [`/daily-ingest`](skills/daily-ingest/SKILL.md) | Automatic daily enrichment, bundled into one PR for review |
+| [`/linear-project-update`](skills/linear-project-update/SKILL.md) | Weekly project status update (Highlights / Lowlights / Focus) |
 
-The `SKILL.md` files are specs (no executable code) — implement them in your stack of choice (bash / python / etc.).
+The skills are config-driven: they read `.vault-config.yml` at runtime (handles, paths, enabled sources), so the same skill works against any vault without code changes. Only the `tools/` cron wrappers (`run-*.sh` + launchd plists) hard-code paths, and `bootstrap.sh --with-automation` substitutes them for you.
 
 ---
 
@@ -255,9 +256,9 @@ The default source list is Slack/Notion/GitHub/web/meetings/claude — you can s
 
 ## 📄 License
 
-This project is open source under the **MIT License** — use it, fork it, adapt it.
+This project is licensed under **CC BY 4.0**. Reuse and adapt it with attribution.
 
 ---
 
 **Last Updated**: 2026-04-29
-**License**: MIT
+**License**: CC BY 4.0
