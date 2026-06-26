@@ -45,13 +45,18 @@ hits="$(grep -rEin 'slack_user_id|slack_dm_id|SLACK_USER_ID' "${SCOPE[@]}" \
 hits="$(grep -rEon '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}' "${SCOPE[@]}" || true)"
 [[ -n "$hits" ]] && report "UUID (possible Notion/Linear id)" "$hits"
 
-# 5. Company markers (org / domain / workspace slug).
-hits="$(grep -rEin 'alan-eu|alan\.eu|alaninsurance' "${SCOPE[@]}" || true)"
-[[ -n "$hits" ]] && report "company marker (alan-eu / alan.eu / alaninsurance)" "$hits"
-
-# 6. Maintainer first name in operational files (the author belongs in README, not here).
-hits="$(grep -rEin '\barthur\b' "${SCOPE[@]}" || true)"
-[[ -n "$hits" ]] && report "maintainer name 'arthur' in operational file" "$hits"
+# 5. Optional PRIVATE extension (gitignored, NOT committed): a maintainer lists
+#    their own company / name markers here (one grep -E pattern per line) so the
+#    public template stays neutral while local / pre-commit runs still catch them.
+#    Absent in public CI by design — keep this file in your private vault.
+EXTRA="$ROOT/.github/neutralize-extra.txt"
+if [[ -f "$EXTRA" ]]; then
+  while IFS= read -r pat; do
+    [[ -z "$pat" || "$pat" == \#* ]] && continue
+    hits="$(grep -rEin -- "$pat" "${SCOPE[@]}" || true)"
+    [[ -n "$hits" ]] && report "private marker /$pat/" "$hits"
+  done < "$EXTRA"
+fi
 
 if [[ "$fail" -eq 0 ]]; then
   echo "✅ template neutralized — no real identifiers in operational files"
