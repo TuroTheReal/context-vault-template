@@ -48,7 +48,8 @@ hits="$(grep -rEon '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-
 # 5. Optional PRIVATE extension (gitignored, NOT committed): a maintainer lists
 #    their own company / name markers here (one grep -E pattern per line) so the
 #    public template stays neutral while local / pre-commit runs still catch them.
-#    Absent in public CI by design — keep this file in your private vault.
+#    Copy neutralize-extra.txt.example to start; keep your real copy in your private
+#    vault. Absent in public CI by design.
 EXTRA="$ROOT/.github/neutralize-extra.txt"
 if [[ -f "$EXTRA" ]]; then
   while IFS= read -r pat; do

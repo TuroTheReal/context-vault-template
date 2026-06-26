@@ -1,0 +1,15 @@
+# Private neutralization markers — EXAMPLE / template.
+#
+# Copy this file to `neutralize-extra.txt` (gitignored) and fill it with YOUR OWN
+# company / name markers. It is read by .github/check-neutralized.sh on local and
+# pre-commit runs, so the public template stays neutral while you still catch your
+# own identifiers before they reach a public repo.
+#
+# Format: one `grep -E` pattern per line. Blank lines and lines starting with # are ignored.
+# Keep your real copy in your PRIVATE vault — it must never be committed here.
+#
+# Examples (replace with your own, then delete these):
+# your-company
+# your-company\.(com|io|eu)
+# \byour-first-name\b
+# internal-tool-name
