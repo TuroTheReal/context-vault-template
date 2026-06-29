@@ -54,3 +54,15 @@ web:
 audit:
   stale_note_days: 90                 # status: active + updated > X days → flagged stale
   pending_raw_days: 30                # ingested: false + captured > X days → flagged pending
+
+# Learn-feedback — transcript mining scope (read by /learn-feedback)
+learn_feedback:
+  # Claude Code project dirs to EXCLUDE from mining. Match = substring on the encoded project
+  # dir name under ~/.claude/projects/ (e.g. "-Users-you-Documents-your-personal-repo"). Glob (*)
+  # allowed. Default [] = mine all projects. Excluded projects produce zero quotes in the PR.
+  exclude_projects: []                # e.g. personal repos you don't want behavioral lessons from
+  # Individual conversations to exclude, by session id (the .jsonl filename without extension).
+  exclude_sessions: []
+  # In-conversation opt-out: any session containing one of your messages with the token "#no-learn"
+  # (also matches "no-learn", case-insensitive) is skipped ENTIRELY — including turns before the
+  # marker. Type it anywhere, anytime in a chat (even at the very end) to exclude that whole session.
