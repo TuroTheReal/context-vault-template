@@ -50,7 +50,7 @@ This skill uses **Linear** as the example project tracker, but the logic is **tr
 - `get_project(query=<project>, includeMilestones=true)` → name, milestones (name / progress / targetDate), `targetDate`, initiatives, `lead`. Confirm `lead` is you; if not, warn (you're reporting on someone else's project).
 - `get_status_updates(type=project, user=me, orderBy=createdAt, limit=5)` then **filter client-side** to `project.id == <id>`. ⚠️ Filtering `get_status_updates` by `project` directly returns `[]` (MCP limitation, verified 2026-06-17) — always query by `user=me` and filter on `project.id`. Take the latest matching update:
   - Latest update's `createdAt` = the time window's lower bound (unless `--since`).
-  - Latest update's `body` = the **reference format** to mirror (section headers, tags like Shipped/Learnt/Pending/Ship, language, emoji style). If none, fall back to the default format below.
+  - Latest update's `body` = the **reference** for section headers, language, and emoji style. For bullet style always use the compact one-tag-per-bullet format below (even if an older update grouped bullets under `*Shipped:*` / `*Learnt:*` sub-headers — that grouping is deprecated). If no prior update, use the default format below.
 
 ### Step 2 — collect activity since the bound
 
@@ -69,30 +69,30 @@ Gather raw signal, then synthesize. Pull from all three sources:
 
 Write the body mirroring Step 1's reference. Default format (team standard) if no prior update:
 
+One short bold tag per bullet, no sub-bucket grouping:
+
 ```
 **✨ Highlights**
 
-*Shipped:*
-* <closed milestones, merged PRs, completed issues — concrete, past tense>
-
-*Learnt:*
-* <decisions settled, answers from syncs, gotchas discovered>
+* **Shipped** - <closed milestone, merged PR, completed issue — past tense, biggest impact first>
+* **Learnt** - <gotcha or technical finding worth sharing>
+* **Decided** - <decision settled, answer from a sync (name who)>
 
 **🤕 Lowlights**
 
-*Pending:*
-* <blocked / not-yet-dug-into items, deferred scope, cancelled work worth flagging>
+* **Delayed** / **Blocked** / **Paused** - <slipped/blocked/paused work + the cause>
 
 **🎯 Focus for this week**
 
-*Ship:*
-* <next concrete steps, tied to the current milestone>
+* **Ship** - <next concrete step, tied to the current milestone>
 ```
 
 Rules:
 - Concise, factual, your voice (short, technical, no fluff, no AI polish). Keep technical terms in English.
+- **One short bold tag per bullet**, no `*Shipped:*` sub-headers. Reuse the prior update's tags (Shipped / Learnt / Decided / Delayed / Blocked / Paused / Ship / Frame / Monitor / Follow-up...); invent one if it fits.
+- **Short + impact-first**: 1-2 lines per bullet, biggest ship leads Highlights. 3+ chained clauses → split or cut.
 - **No em dash.** Use commas, colons, periods. (When mirroring a prior update that used em dashes, still drop them.)
-- Reference issues/PRs the way the prior update did (e.g. `<org>/<repo>#96919` linkifies on Linear).
+- Reference issues/PRs inline (e.g. `<org>/<repo>#96919` linkifies on Linear).
 - Don't restate the milestone % diff (Linear adds it).
 - Set `health`: `onTrack` by default; `atRisk` if a sub-100% milestone's `targetDate` is within ~3 days or passed; `offTrack` if a milestone is clearly blocked. State the reasoning to you, let you override.
 
