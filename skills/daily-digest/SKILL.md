@@ -29,7 +29,7 @@ All optional :
 
 ### Step 0 — re-read schema, identity check
 
-- Read `<vault>/CLAUDE.md` (raw + scope sections). Same rule as `/ingest` and `/fetch-sources` — never operate from memory.
+- Read the vault schema: scope in `<vault>/CLAUDE.md`, raw in `<vault>/SCHEMA.md`. Same rule as `/ingest` and `/fetch-sources` — never operate from memory.
 - Verify the MCP servers consumed (Slack, Linear, GitHub via `gh`, Notion, Gmail, etc.) are authenticated. If not, abort loud with auth instructions.
 - Resolve identity from `<vault>/.vault-config.yml` (`user_handle.*` keys). Skill MUST NOT hard-code your handles. Required keys :
   - `user_handle.slack`
@@ -271,4 +271,4 @@ The skill itself doesn't change — cron is just shell-level invocation + a one-
 
 - [/fetch-sources](../fetch-sources/SKILL.md) — invoked at Step 1 if fetch-summary stale or absent.
 - [/ingest](../ingest/SKILL.md) — independent ; the digest doesn't synthesize into `notes/`, that's manual triage.
-- Vault schema : `<vault>/CLAUDE.md`.
+- Vault schema : `<vault>/CLAUDE.md` + `<vault>/SCHEMA.md`.

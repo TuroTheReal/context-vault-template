@@ -27,4 +27,4 @@ Two files at the vault root:
 
 ## Schema reference
 
-Skills follow the vault schema defined in `<vault>/CLAUDE.md`. Re-read it before any ingestion-related action.
+Skills follow the vault schema defined in `<vault>/CLAUDE.md` (lean core) + `<vault>/SCHEMA.md` (detail). Re-read both before any ingestion-related action.

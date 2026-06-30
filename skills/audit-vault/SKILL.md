@@ -81,7 +81,7 @@ Never modify any file. The output is action items for the user.
 
 ### 4. schema-violations
 
-**What** — notes or raws that don't conform to the current `CLAUDE.md` schema.
+**What** — notes or raws that don't conform to the current `CLAUDE.md` + `SCHEMA.md` schema.
 
 **How** — for each note:
 - Has `sources:` list (not `source:` singular)? Has at least 1 entry?
@@ -295,4 +295,4 @@ The high-water mark from `/fetch-sources` and the audit report from `/audit-vaul
 - [/ingest](../ingest/SKILL.md) — used to act on stale notes / schema violations
 - [/capture](../capture/SKILL.md) — used to refresh dead sources
 - [/fetch-sources](../fetch-sources/SKILL.md) — feeds raws that this audit then surfaces as `pending-raws`
-- Vault schema: `<vault>/CLAUDE.md`
+- Vault schema: `<vault>/CLAUDE.md` + `<vault>/SCHEMA.md`
