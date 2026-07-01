@@ -18,5 +18,6 @@ Before delivering output, re-check against the low-confidence rules. Currently l
 - [planning-design](planning-design.md) · loaded when planning a roadmap or designing a feature/architecture · (no rules yet)
 - [git-repos](git-repos.md) · loaded when doing git / opening a PR on a repo · (no rules yet)
 - [routines](routines.md) · loaded when running one of your recurring vault skills/routines · (no rules yet)
+- [methodology](methodology.md) · loaded when deciding how to approach / organize your work · (no rules yet)
 
 ## archived

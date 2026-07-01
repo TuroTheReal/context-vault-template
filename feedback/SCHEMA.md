@@ -34,7 +34,7 @@ of rules as `###` sections. Capture EDITS the relevant pillar (add / modify / re
 section); NEVER create a new file for a rule that fits an existing pillar. A new file only when a
 genuinely new pillar/domain emerges (rare).
 
-### The 5 pillars
+### The 6 pillars
 
 | pillar | loaded_when |
 |---|---|
@@ -43,11 +43,12 @@ genuinely new pillar/domain emerges (rare).
 | `planning-design` | when planning a roadmap or designing a feature/architecture |
 | `git-repos` | when doing git / opening a PR on a repo |
 | `routines` | when running one of your recurring vault skills/routines |
+| `methodology` | when deciding how to approach / organize your work |
 
 ### Pillar frontmatter
 
 ```yaml
-pillar: <name>                                        # safety | voice | planning-design | git-repos | routines
+pillar: <name>                                        # safety | voice | planning-design | git-repos | routines | methodology
 loaded_when: <one line: the work-moment when this pillar is relevant>
 status: active
 memory_name: feedback_<name>                           # filename of the memory projection (round-trip key)
