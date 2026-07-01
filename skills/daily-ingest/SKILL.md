@@ -45,7 +45,7 @@ All optional:
 
 ### Step 0 — schema, identity, cursor
 
-- Read `<VAULT>/CLAUDE.md` in full (schema source of truth). Never operate from memory.
+- Read `<VAULT>/CLAUDE.md` + `<VAULT>/SCHEMA.md` in full (schema source of truth). Never operate from memory.
 - Identity: `VAULT = <vault>`, `EMAIL = <user_handle.email>`, CC transcripts root = `~/.claude/projects/`.
 - Read the `last_ingest` cursor from `<VAULT>/.vault-state.yml` (created on first run). It is **separate from `last_fetch`** (the digest's): daily-ingest fetches with its OWN cursor via `fetch-sources --cursor ingest`, so the two never steal each other's window.
 
@@ -92,4 +92,4 @@ All optional:
 - [/ingest](../ingest/SKILL.md) — does the actual synthesis (called with `--no-pr` here)
 - [/fetch-sources](../fetch-sources/SKILL.md) — deposits the external raws daily-ingest consumes (run by the digest, not here)
 - [/daily-digest](../daily-digest/SKILL.md) — morning read recap (separate cursor, separate purpose)
-- Vault schema: `<VAULT>/CLAUDE.md`
+- Vault schema: `<VAULT>/CLAUDE.md` + `<VAULT>/SCHEMA.md`

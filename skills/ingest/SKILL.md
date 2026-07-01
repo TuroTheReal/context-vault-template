@@ -55,7 +55,7 @@ Input → resolve raw (capture if needed, live-fetch if stub) →
 
 ### Step 0 — re-read schema
 
-Read `<vault>/CLAUDE.md` in full. Never operate from memory. The schema is the source of truth.
+Read `<vault>/CLAUDE.md` + `<vault>/SCHEMA.md` in full. Never operate from memory. The schema is the source of truth.
 
 ### Step 1 — resolve raw
 
@@ -91,7 +91,7 @@ Read `<vault>/CLAUDE.md` in full. Never operate from memory. The schema is the s
   - **Type** — `project-` (multi-ticket initiative), `decision-` (choice + tradeoff), `context-` (everything else: position, learning, gotcha, org context). Apply the « content > event » filter: if the source is logistics with no density, **abort the ingest** (leave the raw as `ingested: false`, consultable only).
   - **Atomicity check** — does this source contain ONE atomic idea, or several? If several → split into multiple ingestions (one per atomic idea). Never bundle.
   - **Candidate links** (impact/dependency only): which existing notes does this impact? Which does it depend on? Same topic ≠ link. `context-` notes never get linked.
-  - **Tags** — assign from the controlled taxonomy in `CLAUDE.md` (`topic/`, `people/`, `country/`, `kind/`). A tag must trace to real content. Uncertain on an axis → omit it (or `TBD`), never guess.
+  - **Tags** — assign from the controlled taxonomy in `SCHEMA.md` (`topic/`, `people/`, `country/`, `kind/`). A tag must trace to real content. Uncertain on an axis → omit it (or `TBD`), never guess.
 
 **Faithfulness rule** — the synthesized note is a **factual summary** of the source. Never invent, infer beyond what the source states, or stylize. If a fact is not in the source, it does not go in the note. Same rule as CLAUDE.md « Note format » section. This is non-negotiable: a note that adds a fact not in its source is a bug, not a feature.
 
@@ -288,4 +288,4 @@ My position:                                       ← only if the user expresse
 - [/capture](../capture/SKILL.md) — called internally for flow B
 - [/fetch-sources](../fetch-sources/SKILL.md) — produces raws that feed `/ingest`
 - [/audit-vault](../audit-vault/SKILL.md) — surfaces stale notes, broken links, orphan stubs that may need re-ingest
-- Vault schema: `<vault>/CLAUDE.md` — re-read at Step 0 every invocation
+- Vault schema: `<vault>/CLAUDE.md` + `<vault>/SCHEMA.md` — re-read at Step 0 every invocation

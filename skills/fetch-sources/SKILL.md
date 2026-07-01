@@ -64,7 +64,7 @@ on full success, update last_fetch per source.
 
 ### Step 0 — re-read schema + acquire lock
 
-- Read `<vault>/CLAUDE.md` (raw + scope sections). Same rule as `/ingest` — never operate from memory.
+- Read the vault schema: scope in `<vault>/CLAUDE.md`, raw in `<vault>/SCHEMA.md`. Same rule as `/ingest` — never operate from memory.
 - **Acquire file lock** : create `<vault>/.vault-state.yml.lock` with current PID. If lock exists with a live PID → fail loud (« another fetch-sources is running, PID X »). Stale lock → take over and warn. Release on exit.
 
 ### Step 1 — resolve fetch window per source
@@ -447,4 +447,4 @@ The skill itself doesn't change — cron is just a shell-level invocation. The h
 - [/ingest](../ingest/SKILL.md) — consumes a raw OR the dated summary in `digest/`
 - [/audit-vault](../audit-vault/SKILL.md) — health check
 - [/daily-digest](../daily-digest/SKILL.md) — consumes the dated summary in `digest/`, produces a curated digest in `journal/`
-- Vault schema : `<vault>/CLAUDE.md`
+- Vault schema: `<vault>/CLAUDE.md` + `<vault>/SCHEMA.md`

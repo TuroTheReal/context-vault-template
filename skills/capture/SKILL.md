@@ -39,7 +39,7 @@ Does not read `.vault-state.yml` (no high-water mark needed for single-source ca
 
 ## Behavior
 
-1. **Read schema** — `<vault>/CLAUDE.md` (raw section). Never operate from memory.
+1. **Read schema** — `<vault>/SCHEMA.md` (raw section). Never operate from memory.
 2. **Detect source type** from URL (slack/notion/github/web/claude/meetings). If ambiguous → use `--type` or fail.
 3. **Determine volatility**:
    - **Volatile** (full raw): Slack, Claude conversations, web articles, **GitHub open PRs / open issues** (still mutable, comments and edits keep coming)
@@ -163,4 +163,4 @@ Brief: <1-line summary of what this source is and what changed (if re-capture)>
 
 - [/ingest](../ingest/SKILL.md) — calls `/capture` internally if given a URL, then synthesizes
 - [/fetch-sources](../fetch-sources/SKILL.md) — calls `/capture` in batch for all enabled sources
-- Vault schema: `<vault>/CLAUDE.md` — re-read before each invocation
+- Vault schema: `<vault>/CLAUDE.md` + `<vault>/SCHEMA.md` — re-read before each invocation
