@@ -1,8 +1,8 @@
 # Feedback layer · schema
 
 How-to-work-for-you layer. **Source of truth** for behavioral feedback: what you
-validate / modify / reject / refine on what the AI proposes, distilled into atomic
-lessons so the AI ships better first drafts (code, text, design, planning, process).
+validate / modify / reject / refine on what the AI proposes, distilled into rules
+so the AI ships better first drafts (code, text, design, planning, process).
 
 Portable by design: plain markdown in git. Any AI can be pointed at `INDEX.md`. The Claude
 Code `~/.claude/projects/<project>/memory/feedback_*.md` files are a **regenerable projection**
@@ -25,35 +25,43 @@ A wrong feedback is WORSE than none: it degrades every future session until caug
 - Uncertain whether it's a real preference or a one-off → leave it out. (Don't confuse this with
   `confidence`: inclusion is about whether it's a real preference; `confidence` is about how well
   the AI already applies it.)
-- Never overwrite a past lesson. Reversed preference → new file with `supersedes:`, old → `superseded`.
+- Never overwrite a past lesson. Reversed preference → mark the old rule section clearly, add the new one.
 
-## File = one atomic lesson
+## File = one PILLAR (a small fixed set of them)
 
-One preference per file, flat in `feedback/`, named `<kind>-<slug>.md` (e.g. `text-peer-voice.md`).
+`feedback/` holds a small fixed set of PILLAR files (one per work-domain). Each pillar = a list
+of rules as `###` sections. Capture EDITS the relevant pillar (add / modify / remove a rule
+section); NEVER create a new file for a rule that fits an existing pillar. A new file only when a
+genuinely new pillar/domain emerges (rare).
 
-### Frontmatter
+### The 5 pillars
+
+| pillar | loaded_when |
+|---|---|
+| `safety` | before any risky action (git push, deletion, external action, permissions) |
+| `voice` | when writing any text/message/draft for you |
+| `planning-design` | when planning a roadmap or designing a feature/architecture |
+| `git-repos` | when doing git / opening a PR on a repo |
+| `routines` | when running one of your recurring vault skills/routines |
+
+### Pillar frontmatter
 
 ```yaml
-title: [human-readable]
-type: feedback
-kind: [code | text | design | planning | process]   # work-type axis · drives targeted retrieval
-scope: [global | work | repo:<name>]                 # where it applies
-status: [active | superseded]
-confidence: [low | medium | high]                    # ADHERENCE, not evidence: how reliably the AI meets this NOW.
-                                                     # low = still frequently missed / you keep re-giving it = HIGH vigilance.
-                                                     # medium = mostly applied. high = reliably met, rarely corrected.
-tags: [topic/<domain>, ...]                           # optional, controlled (see notes/ taxonomy)
-date: YYYY-MM-DD
-updated: YYYY-MM-DD
+pillar: <name>                                        # safety | voice | planning-design | git-repos | routines
+loaded_when: <one line: the work-moment when this pillar is relevant>
+status: active
+memory_name: feedback_<name>                           # filename of the memory projection (round-trip key)
 source: claude-code-conversation
-sessions: [<session-id>, ...]                         # episodes backing this lesson
-memory_name: [feedback_<slug>]                        # filename of the memory projection (round-trip key)
-supersedes: [optional · slug of replaced feedback]
 ```
 
-### Body
+### Pillar body
+
+Intro line, then one `### <rule>` section per rule. Each `###` heading carries a
+`· scope:<..> · confidence:<..>` tag. Each rule section:
 
 ```
+### <rule> · scope:<global | work | repo:<name>> · confidence:<low | medium | high>
+
 <one-line pattern statement · the rule itself>
 
 **Why:** <your reason, traced to the episode · never invented>
@@ -61,10 +69,17 @@ supersedes: [optional · slug of replaced feedback]
 **How to apply:** <concrete directive the AI follows next time it does this kind of work>
 
 **Episodes:**
-- [YYYY-MM-DD] session <id> · you <said/did X> on <AI proposal Y>
+- session <id> · you <said/did X> on <AI proposal Y>
 ```
 
-Link related feedback in the body with `[[other-slug]]`.
+- `scope` = where the rule applies (`global | work | repo:<name>`).
+- `confidence` = ADHERENCE, not evidence: how reliably the AI meets this NOW. `low` = still
+  frequently missed / you keep re-giving it = HIGH vigilance. `medium` = mostly applied.
+  `high` = reliably met, rarely corrected.
+- A reversed preference does not overwrite a rule: mark the old section clearly and add the new
+  one (mirrors `notes/`'s supersede rule).
+
+Link related feedback in the body with `[[other-name]]`.
 
 ## kind · the retrieval key
 
@@ -84,11 +99,13 @@ Link related feedback in the body with `[[other-slug]]`.
 
 ## INDEX.md
 
-Thin always-loadable index, one line per feedback. The scaling lever: any AI loads only the
-index, retrieves full files by relevance. Format:
+Thin always-loadable index, one line per pillar. The scaling lever: any AI loads only the
+index, retrieves the full pillar file by relevance. Format:
 
 ```
-- [Title](slug.md) · `kind` · `scope` · `confidence` · hook
+- [<name>](<name>.md) · loaded when <moment> · <short hook listing its rules>
 ```
 
+A top "verify before delivering (low-adherence)" block surfaces the currently-`low` rules;
+an "archived" block lists resolved atomic files kept for reference.
 Regenerated by `/learn-feedback`, never hand-edited.

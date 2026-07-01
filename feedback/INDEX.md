@@ -3,16 +3,20 @@
 Last updated: (pending first /learn-feedback run)
 
 <!-- AI-maintained by /learn-feedback. Do not edit manually. -->
-<!-- Thin hook index: any AI loads this, retrieves full feedback/<slug>.md by relevance. -->
-<!-- Format: - [Title](slug.md) · `kind` · `scope` · `confidence` · hook -->
+<!-- Thin hook index: any AI loads this, retrieves the full pillar file feedback/<name>.md by relevance. -->
+<!-- Format: - [<name>](<name>.md) · loaded when <moment> · <short hook listing its rules> -->
 <!-- confidence = adherence, NOT evidence. low = still frequently missed (HIGH vigilance). high = reliably met. -->
 
-## code
+## ⚠️ verify before delivering (low-adherence)
 
-## text
+Before delivering output, re-check against the low-confidence rules. Currently low: (none yet).
 
-## design
+## pillars
 
-## planning
+- [safety](safety.md) · loaded when before any risky action (git push, deletion, external action, permissions) · (no rules yet)
+- [voice](voice.md) · loaded when writing any text/message/draft for you · (no rules yet)
+- [planning-design](planning-design.md) · loaded when planning a roadmap or designing a feature/architecture · (no rules yet)
+- [git-repos](git-repos.md) · loaded when doing git / opening a PR on a repo · (no rules yet)
+- [routines](routines.md) · loaded when running one of your recurring vault skills/routines · (no rules yet)
 
-## process
+## archived
