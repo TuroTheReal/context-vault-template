@@ -18,8 +18,10 @@ A wrong feedback is WORSE than none: it degrades every future session until caug
 
 - Distill **only** from your **stated words** and **observed actions** (validated, edited,
   rejected, reordered). Never infer a preference you did not express or enact. **Zero deduction.**
-- Every feedback traces to at least one concrete **episode** (session id + what you said/did
-  on what the AI proposed). No episode = no feedback. Mirrors `notes/`'s "no source URL = no note".
+- Every feedback traces to at least one concrete **episode**, logged as a line in `log.md` (date ·
+  session id + what you said/did on what the AI proposed). No ledger line = no feedback. The trace
+  lives in `log.md`, NOT inline in the pillar (bodies stay behavioral, see below). Mirrors `notes/`'s
+  "no source URL = no note".
 - The AI's own analyses/suggestions are NOT your preference. Capture them only if you
   explicitly validated them, framed as "you validated X".
 - Uncertain whether it's a real preference or a one-off → leave it out. (Don't confuse this with
@@ -58,29 +60,37 @@ source: claude-code-conversation
 ### Pillar body
 
 Intro line, then one `### <rule>` section per rule. Each `###` heading carries a
-`· scope:<..> · confidence:<..>` tag. Each rule section:
+`· scope:<..> · confidence:<..>` tag. **The body is BEHAVIORAL: direct directives the AI applies,
+not a log of who corrected what.** No inline `**Why:**`, no inline `**Episodes:**`, no session ids /
+dates / raw quotes in the pillar. Provenance goes to `log.md` (see below). Format:
 
 ```
-### <rule> · scope:<global | work | repo:<name>> · confidence:<low | medium | high>
+### <behavioral rule> · scope:<global | work | repo:<name>> · confidence:<low | medium | high>
 
-<one-line pattern statement · the rule itself>
-
-**Why:** <your reason, traced to the episode · never invented>
-
-**How to apply:** <concrete directive the AI follows next time it does this kind of work>
-
-**Episodes:**
-- session <id> · you <said/did X> on <AI proposal Y>
+<direct behavioral directive(s): what to do, phrased for application, prose or bullets.
+Concrete anchors are fine; no "you said ..." framing.>
 ```
 
+- Write the rule as a behavior to apply next time, not as history. If a pattern repeats, state it
+  directly, don't cite the conversation.
+- **Exception, `safety` only:** a rule may carry a one-line inline reason when understanding WHY
+  changes how the AI treats adjacent cases. Everywhere else, the why lives in `log.md`.
 - `scope` = where the rule applies (`global | work | repo:<name>`).
 - `confidence` = ADHERENCE, not evidence: how reliably the AI meets this NOW. `low` = still
   frequently missed / you keep re-giving it = HIGH vigilance. `medium` = mostly applied.
-  `high` = reliably met, rarely corrected.
+  `high` = reliably met, rarely corrected. `confidence` stays inline (it's a signal the AI uses).
 - A reversed preference does not overwrite a rule: mark the old section clearly and add the new
   one (mirrors `notes/`'s supersede rule).
+- Link related feedback in the body with `[[other-name]]`.
 
-Link related feedback in the body with `[[other-name]]`.
+### Trace ledger (`log.md`)
+
+`feedback/log.md` holds the provenance the pillar bodies omit: one `## <pillar>` section, per-rule
+bullets `- **<rule>** — <date> · session <id> · what you said/did on what the AI proposed`
+(the key quote may be kept). It is the write-time fidelity guard (no ledger line = no rule) and the
+record used to resolve contradictions / staleness. It is NOT loaded at read-time, so it can be as
+detailed as needed without costing the always-loaded context budget. When adding or editing a rule,
+add or adjust its ledger line in the same change.
 
 ## kind · the retrieval key
 

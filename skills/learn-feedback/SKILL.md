@@ -18,11 +18,12 @@ adds a few lessons; the PR review keeps them honest.
 ## Pillar model (read this before anything)
 
 `feedback/` is a small fixed set of PILLAR files (one per work-domain: `safety`, `voice`,
-`planning-design`, `git-repos`, `routines`), NOT atomic one-rule files. Each pillar = a list
-of rules as `###` sections (each tagged `· scope:<..> · confidence:<..>`). Capture and dedup
-operate on pillars: a new preference is a rule SECTION added to (or edited in) the matching pillar,
-never a new file. A new file only when a genuinely new pillar/domain emerges (rare). See
-`<VAULT>/feedback/SCHEMA.md`.
+`planning-design`, `git-repos`, `routines`, `methodology`), NOT atomic one-rule files. Each pillar =
+a list of rules as `###` sections (each tagged `· scope:<..> · confidence:<..>`). **Rule bodies are
+BEHAVIORAL** (direct directives, no inline why/episodes); the provenance (why + episode) lives in
+`feedback/log.md`, the trace ledger, not in the pillar. Capture and dedup operate on pillars: a new
+preference is a rule SECTION added to (or edited in) the matching pillar, never a new file. A new
+file only when a genuinely new pillar/domain emerges (rare). See `<VAULT>/feedback/SCHEMA.md`.
 
 ## Two-layer model (read this before anything)
 
@@ -41,8 +42,9 @@ Identical to `/daily-ingest`, applied to reactions. A wrong lesson degrades ever
 
 - Only your **stated words** and **observed actions**. Never infer a preference you didn't express
   or enact. **Zero deduction.**
-- Every lesson traces to ≥1 concrete **episode** (session id + what you said/did on what the AI
-  proposed). No episode = no lesson.
+- Every lesson traces to ≥1 concrete **episode**, logged as a line in `feedback/log.md` (date +
+  session id + what you said/did on what the AI proposed). No ledger line = no lesson. The trace
+  goes to `log.md`, never inline in the pillar (bodies stay behavioral).
 - The AI's suggestions are not your preference unless you explicitly validated them.
 - Unsure if it's a real preference vs a one-off → omit (an inclusion call, separate from `confidence`).
 
@@ -62,7 +64,7 @@ file, apply Step 4's dedup logic against the pillar's current rules).
 
 **Flag-before-write on two pillars:** for a `safety` or `git-repos` rule, FLAG the proposed capture
 to you and get your OK before writing (no silent write on those two, they gate risky/irreversible
-behavior). The other three pillars (`voice`, `planning-design`, `routines`) write directly.
+behavior). The other four pillars (`voice`, `planning-design`, `routines`, `methodology`) write directly.
 
 Hot-takes touch MEMORY only (immediate behavior change). They do NOT open a PR. The weekly cron
 back-fills them into the vault PR (Step 5), where you review / edit / veto them; `--sync-on-merge`
@@ -157,12 +159,13 @@ Keep the two layers consistent before mining (VAULT WINS):
 For each episode carrying a generalizable preference:
 - Determine the target PILLAR (safety / voice / planning-design / git-repos / routines) from
   the work-moment, and `scope` (global/work/repo:X) from where it applies.
-- Write the rule as a `###` section per `SCHEMA.md`: `### <rule> · scope:<..> · confidence:<..>`
-  heading + one-line rule + **Why** (traced) + **How to apply** (concrete directive) + **Episodes**.
-  Set `confidence` by ADHERENCE (see SCHEMA), not evidence count: `low`
-  if you keep re-giving it / it's still frequently missed (high vigilance), `medium` if mostly
-  applied, `high` if reliably met. Default a fresh lesson to `medium`; use `low` when there's a clear
-  pattern of repeated re-correction.
+- Write the rule as a `###` section per `SCHEMA.md`: `### <behavioral rule> · scope:<..> · confidence:<..>`
+  heading + a BEHAVIORAL body (direct directives, what to do). No inline **Why** / **Episodes** in the
+  pillar; put the provenance (why + episode) as a line in `feedback/log.md` instead. `safety` may keep
+  a one-line inline reason when it changes handling. Set `confidence` by ADHERENCE (see SCHEMA), not
+  evidence count: `low` if you keep re-giving it / it's still frequently missed (high vigilance),
+  `medium` if mostly applied, `high` if reliably met. Default a fresh lesson to `medium`; use `low`
+  when there's a clear pattern of repeated re-correction.
 - Drop pure one-offs with no transfer value. A correction specific to one file/PR with no general
   rule behind it is not a lesson.
 
@@ -173,20 +176,21 @@ For each candidate, grep BOTH the vault pillars (`feedback/*.md`) AND the memory
 hot-take already captured mid-session (see above) is not duplicated as a "new" rule.
 - **new** → add a new `###` rule section to the matching pillar (add the file only if a genuinely
   new pillar/domain emerges).
-- **reinforcement** → update the existing rule section in its pillar: add the episode to
-  **Episodes:**, bump the pillar's context. CONFIDENCE INVERSION: a repeat correction means you
-  are STILL having to re-give this → keep or LOWER the section's `confidence` toward `low` (high
-  vigilance). Do NOT raise it. Raise confidence only when corrections have stopped over time.
-  Sharpen "How to apply" only with traced detail.
+- **reinforcement** → sharpen the existing behavioral rule in its pillar and add a new line to that
+  rule's entry in `feedback/log.md`. CONFIDENCE INVERSION: a repeat correction means you are STILL
+  having to re-give this → keep or LOWER the section's `confidence` toward `low` (high vigilance).
+  Do NOT raise it. Raise confidence only when corrections have stopped over time. Fold the new signal
+  into the behavioral body; don't append a dated block.
 - **contradiction** → mark the old rule section clearly and add the new one in the same pillar.
   Never overwrite a past conclusion (mirrors `notes/` supersede rule).
 
 ### Step 5 · ONE review PR
 
 - Branch once: `git -C <VAULT> checkout -b vault-sync/<YYYY-MM-DD>-feedback origin/main`.
-- Write/update the pillar files + regenerate `INDEX.md` + append to `log.md`. One commit per pillar
-  touched (clean history). This is also where hot-takes captured mid-week get back-filled into the
-  vault PR (they already live in memory; the PR reconciles them into the source of truth).
+- Write/update the pillar files (behavioral bodies) + add each rule's trace line to `feedback/log.md`
+  + regenerate `INDEX.md`. One commit per pillar touched (clean history). This is also where hot-takes
+  captured mid-week get back-filled into the vault PR (they already live in memory; the PR reconciles
+  them into the source of truth).
 - `git push -u origin vault-sync/<date>-feedback` then ONE `gh pr create --title
   "vault-sync: feedback <date>" --body "<per-rule summary: pillar · scope · confidence · hook + episode refs>"`.
 - **Exactly one PR per run.** `auto_merge: false` · you review, edit, delete candidates, merge.
@@ -220,8 +224,8 @@ system optimizes for application, not accumulation:
 - **Memory projection format** = one file per pillar, `feedback_<pillar>.md`: frontmatter `name`
   (= `feedback_<pillar>`) + `description` (one line covering the pillar's rules) + `metadata:
   node_type: memory / type: feedback`; body = intro line + one `### rule · scope · confidence`
-  section each (pattern + Why + How to apply + `[[links]]`). The pillar's `memory_name:` is the
-  round-trip key.
+  section each, BEHAVIORAL (direct directives + `[[links]]`, no inline why/episodes, same as the
+  pillar). The pillar's `memory_name:` is the round-trip key.
 
 ## Related
 
