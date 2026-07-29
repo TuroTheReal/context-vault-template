@@ -4,7 +4,7 @@ Last updated: (pending first /learn-feedback run)
 
 <!-- AI-maintained by /learn-feedback. Do not edit manually. -->
 <!-- Thin hook index: any AI loads this, retrieves the full pillar file feedback/<name>.md by relevance. -->
-<!-- Format: - [<name>](<name>.md) · loaded when <moment> · <short hook listing its rules> -->
+<!-- Pillar bodies are BEHAVIORAL (direct directives). Provenance (why + episode) lives in log.md, not inline. -->
 <!-- confidence = adherence, NOT evidence. low = still frequently missed (HIGH vigilance). high = reliably met. -->
 
 ## ⚠️ verify before delivering (low-adherence)
@@ -19,5 +19,9 @@ Before delivering output, re-check against the low-confidence rules. Currently l
 - [git-repos](git-repos.md) · loaded when doing git / opening a PR on a repo · (no rules yet)
 - [routines](routines.md) · loaded when running one of your recurring vault skills/routines · (no rules yet)
 - [methodology](methodology.md) · loaded when deciding how to approach / organize your work · (no rules yet)
+
+## provenance
+
+- [log.md](log.md) · trace ledger. Rule bodies stay behavioral; the why + episode (date · session id · what you said/did) lives here. Write-time fidelity guard (no ledger line = no rule); not loaded at read-time.
 
 ## archived
