@@ -4,7 +4,7 @@
 #
 # Turns a fresh clone of this template into a working vault: creates the local
 # config/state files, fills the one deterministic value (vault_path), wires the
-# skills into Claude Code, and drops the template's maintainer-only CI (the
+# skills + harness config (global CLAUDE.md, settings) into Claude Code, and drops the template's maintainer-only CI (the
 # neutralization guard is for the public template, not your private instance).
 # Personal handles and the
 # source toggles stay a manual edit (a handful of one-time fields) — this script
@@ -129,6 +129,38 @@ else
   info ".github/ already absent"
 fi
 
+# --- 2c. wire harness config (global ~/.claude) ------------------------------
+if [[ -d "$TARGET/harness" ]]; then
+  step "Harness config → ~/.claude"
+  CLAUDE_DIR="${HOME}/.claude"
+  mkdir -p "$CLAUDE_DIR"
+  [[ -f "$TARGET/harness/settings.json" ]] && subst "<vault>" "$TARGET" "$TARGET/harness/settings.json"
+
+  # symlink a harness file into ~/.claude, backing up any existing real file first
+  link_harness () {
+    local src="$1" dest="$2" name; name="$(basename "$dest")"
+    [[ -e "$src" ]] || { warn "$name → source missing in vault, skipped"; return; }
+    if [[ -L "$dest" ]]; then
+      info "$name → already a symlink, left as-is"
+    elif [[ -e "$dest" ]]; then
+      mv "$dest" "$dest.bak-$(date +%Y%m%d-%H%M%S)"
+      ln -s "$src" "$dest"; info "$name → linked (existing backed up)"
+    else
+      ln -s "$src" "$dest"; info "$name → linked"
+    fi
+  }
+  link_harness "$TARGET/harness/CLAUDE.md"     "$CLAUDE_DIR/CLAUDE.md"
+  link_harness "$TARGET/harness/settings.json" "$CLAUDE_DIR/settings.json"
+  if [[ ! -e "$CLAUDE_DIR/agents" ]]; then
+    ln -s "$TARGET/harness/agents" "$CLAUDE_DIR/agents"; info "agents → linked"
+  else
+    info "agents → ~/.claude/agents exists, skipped (move them into harness/agents to version them)"
+  fi
+  ok "harness config linked (fill harness/CLAUDE.md placeholders; extend the allowlist as you go)"
+else
+  info "no harness/ dir — skipping harness config"
+fi
+
 # --- 3. optional automation layer (macOS launchd) ----------------------------
 if [[ "$WITH_AUTOMATION" == true ]]; then
   step "Automation (launchd)"
@@ -177,9 +209,14 @@ cat <<EOF
        • fetch_sources  → set true only for the sources you actually use
        • git_remote     → "<owner>/<repo>" once you create the private repo
        (notion_user_id / linear_user_id resolve themselves on the first fetch)
-  2. Make the repo private (it will hold personal context).
-  3. Connect the MCP server for each enabled source.
-  4. Try it:  cd $TARGET && claude   then  /fetch-sources  ·  /ingest <url>
+  2. Fill $TARGET/harness/CLAUDE.md placeholders (<Your Name>, profile, voice) and
+     extend $TARGET/harness/settings.json — both now symlinked into ~/.claude.
+  3. (optional) Back Claude Code's project memory with this vault:
+       ln -s $TARGET/memory ~/.claude/projects/<enc>/memory
+       <enc> = your project's absolute cwd with every '/' replaced by '-'.
+  4. Make the repo private (it will hold personal context).
+  5. Connect the MCP server for each enabled source.
+  6. Try it:  cd $TARGET && claude   then  /fetch-sources  ·  /ingest <url>
 
 Done. The vault is wired; fill the config and you're live.
 EOF
