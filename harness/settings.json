@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(grep:*)",
+      "Bash(echo:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(wc:*)",
+      "Bash(sort:*)",
+      "Bash(uniq:*)",
+      "Bash(cut:*)",
+      "Bash(tr:*)",
+      "Bash(which:*)",
+      "Bash(command:*)",
+      "Bash(date:*)",
+      "Bash(stat:*)",
+      "Bash(file:*)",
+      "Bash(jq:*)",
+      "Bash(ps:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)",
+      "Bash(git add:*)",
+      "Read(<vault>/**)",
+      "Edit(<vault>/**)",
+      "Write(<vault>/**)"
+    ],
+    "deny": [],
+    "ask": []
+  },
+  "hooks": {}
+}

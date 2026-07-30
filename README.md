@@ -98,12 +98,21 @@ The vault is built around three core concepts and three distinct link axes.
 ```
 context-vault-template/
 ├── CLAUDE.md                       # Vault schema (rules, frontmatter, ingestion flow)
-├── bootstrap.sh                    # One-shot init: config + skills wiring (+ optional launchd)
+├── bootstrap.sh                    # One-shot init: config + skills + harness wiring (+ optional launchd)
 ├── .vault-config.yml.example       # Static config template
 ├── .vault-state.yml.example        # Dynamic state template
 ├── .gitignore                      # OS / Obsidian / state files excluded
 ├── index.md                        # Catalog of notes (empty at bootstrap)
 ├── log.md                          # Append-only audit trail (empty at bootstrap)
+├── harness/                        # Generic ~/.claude config (symlinked in by bootstrap)
+│   ├── CLAUDE.md                   #   global constitution (fill placeholders)
+│   ├── settings.json               #   permissions / hooks (safe read-only defaults)
+│   └── hooks/  agents/             #   mechanical guardrails · custom subagents
+├── memory/                         # Always-loaded summary layer (symlinked to ~/.claude memory)
+│   ├── MEMORY.md                   #   thin always-loaded index
+│   └── SCHEMA.md                   #   layer schema (summaries point to notes/meta)
+├── meta/                           # Harness documentation (how your setup works)
+├── feedback/                       # Behavioral rules (how the AI should work for you)
 ├── notes/                          # Synthesized notes (atomic, typed, sourced)
 ├── raw/                            # Captured raw sources (full or stub)
 │   ├── slack/  notion/  github/  github_discussions/
@@ -114,8 +123,8 @@ context-vault-template/
 ├── audit/                          # /audit-vault reports (artifacts, gitignored)
 │   └── README.md
 ├── tools/                          # cron wrappers (run-*.sh) + launchd plists
-└── skills/                         # 7 operational skills, each a Claude Code SKILL.md
-    ├── capture/  ingest/  fetch-sources/  audit-vault/
+└── skills/                         # 8 operational skills, each a Claude Code SKILL.md
+    ├── capture/  ingest/  fetch-sources/  audit-vault/  learn-feedback/
     └── daily-digest/  daily-ingest/  linear-project-update/
 ```
 
