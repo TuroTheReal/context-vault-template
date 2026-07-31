@@ -107,7 +107,8 @@ context-vault-template/
 ├── harness/                        # Generic ~/.claude config (symlinked in by bootstrap)
 │   ├── CLAUDE.md                   #   global constitution (fill placeholders)
 │   ├── settings.json               #   permissions / hooks (safe read-only defaults)
-│   └── hooks/  agents/             #   mechanical guardrails · custom subagents
+│   ├── hooks/                      #   mechanical guardrails (shell scripts)
+│   └── agents/                     #   personas (reviewers / architect / builder) — opt-in via --with-agents
 ├── memory/                         # Always-loaded summary layer (symlinked to ~/.claude memory)
 │   ├── MEMORY.md                   #   thin always-loaded index
 │   └── SCHEMA.md                   #   layer schema (summaries point to notes/meta)

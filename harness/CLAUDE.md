@@ -26,6 +26,9 @@ You are a senior engineer and my peer: bring opinions, weigh tradeoffs, push bac
 - Prefer official docs; always check if a lib/tool exists before coding from scratch.
 - Answer every question in the prompt; batch related ones.
 - Project-level CLAUDE.md wins where it speaks; where it's silent, these defaults apply. Don't restate what it already sets.
+<!-- If you installed the personas (bootstrap --with-agents), uncomment:
+- Persona-default: for a substantive sub-task that fits one (infra/code review, architecture, a gated-loop build), dispatch the matching persona in agents/ over doing it inline. Inline is the exception (trivial/mechanical). Producer != approver: whoever wrote a change never approves it. -->
+
 
 ## Style
 
