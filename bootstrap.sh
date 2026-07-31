@@ -18,6 +18,8 @@
 # Options:
 #   --target DIR        Vault directory to initialize (default: this script's dir)
 #   --skills-dir DIR    Where to symlink skills (default: ~/.claude/skills)
+#   --with-agents       Wire harness/agents/ personas (+ the gated-loop pattern) into ~/.claude/agents.
+#                       Off by default: personas dispatch subagents (extra context + opus models) = higher token cost.
 #   --with-automation   Substitute + install the launchd cron agents (macOS)
 #   -h, --help          Show this help
 #
@@ -38,6 +40,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 TARGET="$SCRIPT_DIR"
 SKILLS_DIR="${HOME}/.claude/skills"
 WITH_AUTOMATION=false
+WITH_AGENTS=false
 
 # --- ui helpers --------------------------------------------------------------
 info ()  { printf '  %s\n' "$1"; }
@@ -71,6 +74,7 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --target)      TARGET="${2:?--target needs a directory}"; shift 2 ;;
     --skills-dir)  SKILLS_DIR="${2:?--skills-dir needs a directory}"; shift 2 ;;
+    --with-agents) WITH_AGENTS=true; shift ;;
     --with-automation) WITH_AUTOMATION=true; shift ;;
     -h|--help)     usage 0 ;;
     *)             warn "unknown option: $1"; usage 1 ;;
@@ -151,10 +155,14 @@ if [[ -d "$TARGET/harness" ]]; then
   }
   link_harness "$TARGET/harness/CLAUDE.md"     "$CLAUDE_DIR/CLAUDE.md"
   link_harness "$TARGET/harness/settings.json" "$CLAUDE_DIR/settings.json"
-  if [[ ! -e "$CLAUDE_DIR/agents" ]]; then
-    ln -s "$TARGET/harness/agents" "$CLAUDE_DIR/agents"; info "agents → linked"
+  if [[ "$WITH_AGENTS" == true ]]; then
+    if [[ ! -e "$CLAUDE_DIR/agents" ]]; then
+      ln -s "$TARGET/harness/agents" "$CLAUDE_DIR/agents"; info "agents → linked (personas + gated-loop enabled)"
+    else
+      info "agents → ~/.claude/agents exists, skipped (move them into harness/agents to version them)"
+    fi
   else
-    info "agents → ~/.claude/agents exists, skipped (move them into harness/agents to version them)"
+    info "agents → skipped (opt-in via --with-agents; personas dispatch subagents = more tokens)"
   fi
   ok "harness config linked (fill harness/CLAUDE.md placeholders; extend the allowlist as you go)"
 else
