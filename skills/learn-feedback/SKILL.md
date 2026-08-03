@@ -127,10 +127,12 @@ Keep the two layers consistent before mining (VAULT WINS):
 - Glob CC transcripts modified since the cursor: `~/.claude/projects/*/*.jsonl`. **Exclude**
   `**/subagents/**` and `**/workflows/**` (internal agent runs, not you). All projects, not just
   your main work repo (behavior should align everywhere).
-- **Apply exclusions** from `.vault-config.yml` `learn_feedback:`:
+- **Apply exclusions** (`exclude_projects` lives in the gitignored `.vault-config.local.yml`, shared
+  with `/daily-ingest`, so personal repo names stay out of the committed vault; `exclude_sessions`
+  stays under `learn_feedback:` in `.vault-config.yml`):
   - drop any transcript whose project dir matches `exclude_projects` (substring/glob on the encoded
-    dir name, e.g. `-Users-you-Documents-your-personal-repo`),
-  - drop any session whose id is in `exclude_sessions`,
+    dir name, e.g. `-Users-you-Documents-<personal-repo>`),
+  - drop any session whose id is in `learn_feedback.exclude_sessions`,
   - drop any session in which ANY of your messages contains the token `#no-learn` (also matches
     `no-learn`, case-insensitive). Position is irrelevant: a marker typed at the very end excludes
     the WHOLE session, earlier turns included.

@@ -28,6 +28,7 @@ All optional :
 - `--until <YYYY-MM-DD | ISO datetime>` — cap the fetch at that point (default: now)
 - `--sources <comma-separated>` — limit to a subset (e.g. `--sources slack,notion`). Default: all sources with `fetch_sources.<type>: true` in config
 - `--except <comma-separated>` — exclude one or more sources (e.g. `--except github_discussions,web`). Combine with `--sources` or alone.
+- `--no-dms` — skip Slack DMs entirely (Query A `to:me`). Only channel mentions/threads (Query B) are fetched. Passed by `/daily-ingest` because DMs are private and must never be auto-ingested into the vault. The digest omits the flag, so its inbox still surfaces DMs.
 - `--min-interval <duration>` — skip a source if `last_fetch[S]` is more recent than `now - duration` (ex: `--min-interval 30m`). Avoids double-runs (cron + manual). Default: 0 (disabled).
 - `--summary <brief|full|none>` — output verbosity (Step 6).
   - `brief` (default) : per-source counters (`5 captured, 2 skipped, 0 failed`).
@@ -190,6 +191,8 @@ Query B (mentions in channels) : <@USER_ID> after:<since> -from:<@USER_ID>
 ```
 
 Then dedup client-side by `thread_ts` (a message can surface in both queries).
+
+**`--no-dms`** : when the flag is passed (the `/daily-ingest` case), **Query A (DMs) is skipped entirely** — only channel mentions/threads (Query B) are fetched. DMs are private (perf reviews, 1:1s, personal exchanges) and must never be auto-ingested into the vault. The digest does NOT pass the flag, so it keeps DMs in its inbox. A specific DM worth keeping in the vault is a manual `/capture <url>` decision, never an automatic ingest.
 
 **Not included** :
 

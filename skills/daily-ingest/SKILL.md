@@ -51,13 +51,15 @@ All optional:
 
 ### Step 1 — external sources of the day (fetch via dedicated cursor)
 
-- Run `/fetch-sources --cursor ingest --summary full`. This fetches the day's delta from the **your-company core sources** (Slack, Notion, GitHub PRs/issues, GitHub Discussions, Linear) since `last_ingest`, and writes `digest/<date>-fetch-summary.md`. `--cursor ingest` reads/writes `last_ingest.<source>` (NOT `last_fetch`), so the digest's window is untouched.
+- Run `/fetch-sources --cursor ingest --summary full --no-dms`. This fetches the day's delta from the **your-company core sources** (Slack channel mentions/threads, Notion, GitHub PRs/issues, GitHub Discussions, Linear) since `last_ingest`, and writes `digest/<date>-fetch-summary.md`. `--cursor ingest` reads/writes `last_ingest.<source>` (NOT `last_fetch`), so the digest's window is untouched. **`--no-dms` is mandatory here**: Slack DMs are private and must never be auto-ingested into the vault (the digest fetches them for your own inbox, the ingest does not).
 - `fetch-sources` no longer deposits individual raws — it produces this single summary. `/ingest` consumes the summary directly (it accepts a raw OR the whole summary).
 - Apply the "content > event" filter: noise (auto-tag / CODEOWNERS review-requests, pure logistics) is NOT promoted to notes — only items carrying a decision / position / tradeoff / learning. your own active Linear/GitHub work IS signal.
+- **Slack DMs are private → NEVER promoted to notes**, whatever they contain (perf reviews, 1:1s, personal exchanges). `--no-dms` already keeps them out of the summary; if a DM ever surfaces anyway, drop it. A specific DM genuinely worth keeping is your call via a manual `/capture <url>`, never an automatic ingest.
 
 ### Step 2 — reasoning capture (Claude Code transcripts)
 
-- Find CC transcripts modified since `last_ingest`: `~/.claude/projects/*/*.jsonl`. **Exclude** `**/subagents/**` and `**/workflows/**` (internal agent runs, not your reasoning). Prefer sessions where you actually interacted (real `type=="user"` text messages, not just tool-results).
+- Find CC transcripts modified since `last_ingest`: `~/.claude/projects/*/*.jsonl`. **Exclude** `**/subagents/**` and `**/workflows/**` (internal agent runs, not your reasoning), **AND any project dir matching `exclude_projects` in the gitignored `.vault-config.local.yml`** (your personal repos, the same shared list `/learn-feedback` uses; kept machine-local so the names never enter the committed vault; substring match on the encoded dir name, e.g. `-Users-you-Documents-<personal-repo>`; file absent/empty → scan all). Prefer sessions where you actually interacted (real `type=="user"` text messages, not just tool-results).
+  - **Mixed-session caveat** (same as `/learn-feedback`): the filter matches on the project dir (cwd at launch). Personal-repo work done from *inside* another project's session is NOT caught by the dir filter — drop those episodes at capture time when a raw is clearly scoped to an excluded personal repo.
 - Extract **only your signal**:
   - `type == "user"` entries whose content is genuine you text (a plain string), NOT injected tool-results/system reminders.
   - your explicit decisions: validations ("go", "ok", "valide"), your picks in `AskUserQuestion` answers, your corrections.

@@ -33,7 +33,7 @@ auto_merge: false                     # never. PR review is the safety net.
 # Fetch-sources — which sources to sweep in batch
 # Enable only the sources you actually use. Adapt the source list to your stack.
 fetch_sources:
-  slack: false                        # set true if you use Slack
+  slack: false                        # set true if you use Slack (DMs feed the digest inbox; /daily-ingest runs --no-dms so DMs are never auto-ingested)
   notion: false                       # set true if you use Notion
   github: false                       # set true if you use GitHub (PRs + issues)
   github_discussions: false           # set true if you use GitHub Discussions (separate cycle, GraphQL via gh api)
@@ -55,12 +55,14 @@ audit:
   stale_note_days: 90                 # status: active + updated > X days → flagged stale
   pending_raw_days: 30                # ingested: false + captured > X days → flagged pending
 
-# Learn-feedback — transcript mining scope (read by /learn-feedback)
+# Personal-project exclusions — repos that are YOURS, not work. Excluded from the Claude Code
+# transcript scan by BOTH /daily-ingest AND /learn-feedback. The list lives in the gitignored
+# .vault-config.local.yml (copy from .vault-config.local.yml.example) so personal project names
+# never enter your committed vault. Absent / empty → scan all projects.
+
+# Learn-feedback — extra mining scope (read by /learn-feedback only; the personal-repo exclusion is
+# the shared exclude_projects in .vault-config.local.yml)
 learn_feedback:
-  # Claude Code project dirs to EXCLUDE from mining. Match = substring on the encoded project
-  # dir name under ~/.claude/projects/ (e.g. "-Users-you-Documents-your-personal-repo"). Glob (*)
-  # allowed. Default [] = mine all projects. Excluded projects produce zero quotes in the PR.
-  exclude_projects: []                # e.g. personal repos you don't want behavioral lessons from
   # Individual conversations to exclude, by session id (the .jsonl filename without extension).
   exclude_sessions: []
   # In-conversation opt-out: any session containing one of your messages with the token "#no-learn"
