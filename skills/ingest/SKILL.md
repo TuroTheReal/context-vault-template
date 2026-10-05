@@ -175,7 +175,7 @@ Read `<vault>/CLAUDE.md` + `<vault>/SCHEMA.md` in full. Never operate from memor
 ### Step 8 — update index.md
 
 - Add (CREATE) or refresh (UPDATE) the note's entry in `<vault>/index.md` under the right section (Projects / Decisions / Context)
-- Format: `- [[note-name]] — <description> (created: YYYY-MM-DD, updated: YYYY-MM-DD) [status if not active]`
+- Format: `- [[note-name]] : <description> (created: YYYY-MM-DD, updated: YYYY-MM-DD) [status if not active]`
 - Bump `Last updated:` at top of index.md
 
 ### Step 9 — append to log.md
@@ -200,7 +200,8 @@ git push -u origin vault-sync/YYYY-MM-DD-<short-slug>
 gh pr create --title "vault-sync: <action> <note-name>" --body "<diff summary + sources>"
 ```
 
-- `auto_merge: false` always — the user reviews and merges
+- `auto_merge: false` always: the user reviews and merges
+- After the PR is opened, **switch back to `main`** (`git checkout main`). The vault working tree may be the live memory (`memory/` symlinked by bootstrap): while a `vault-sync/...` branch is checked out, every session reads that branch, and a memory edit made there leaves with the PR instead of landing on `main`.
 - One ingest = one commit. Multiple ingests in a session = multiple commits on the same `vault-sync/<date>-<slug>` branch (or separate branches if independent)
 - Output the PR URL
 
@@ -276,7 +277,7 @@ My position:                                       ← only if the user expresse
 
 ## Does NOT
 
-- Run anything in parallel — one note per ingest, one ingest at a time. For multiple notes, spawn one agent per note.
+- Run anything in parallel: one note per ingest, one ingest at a time. For multiple notes, run them sequentially in the current session (default, cheapest in Claude usage); one agent per note only if the user explicitly asks.
 - Touch unrelated notes (only the target + its `links:` for coherence checks)
 - Auto-resolve contradictions
 - Modify old notes' conclusions when superseding

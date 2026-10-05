@@ -33,7 +33,8 @@ Archives one source into `<vault>/raw/<source-type>/`. Pure archival — does no
 
 From `<vault>/.vault-config.yml` (static config):
 - `vault_path` — where to write raw
-- `fetch_sources.<type>` — must be `true` for the source type to be enabled
+
+Does NOT read `fetch_sources.*`: those toggles only drive the automatic sweep of `/fetch-sources`. A manual `/capture` (or `/ingest`, which calls it) is an explicit request and accepts any source type it can read, swept or not.
 
 Does not read `.vault-state.yml` (no high-water mark needed for single-source capture).
 
