@@ -116,8 +116,8 @@ Read `<vault>/CLAUDE.md` + `<vault>/SCHEMA.md` in full. Never operate from memor
 
 ### Step 4a — CREATE a new note
 
-- Path: `<vault>/notes/<type>-<short-slug>.md` (e.g. `decision-bigquery-migration.md`)
-- Slug: kebab-case, descriptive, ≤ 4 words
+- Path: `<vault>/notes/<type>-<project>-<topic>.md` for a note scoped to one project (e.g. `decision-billing-bigquery-migration.md`), `<vault>/notes/<type>-<topic>.md` for a cross-cutting one. See CLAUDE.md « File naming ».
+- Slug: kebab-case, descriptive, `<topic>` ≤ 4 words, same `<project>` token across a project's notes
 - Write frontmatter (template below)
 - Write body:
   - **First line**: `**Sources**: <human label 1>, <human label 2>`

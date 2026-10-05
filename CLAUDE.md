@@ -63,6 +63,14 @@ Read the source content deeply before choosing a type. Never type from title alo
 
 Other prefixes (person-, area-) only when referenced in 5+ notes.
 
+### File naming
+
+`notes/` is flat, so the name carries the scope:
+
+- `<type>-<project>-<topic>.md` when the note belongs to one project (e.g. `decision-billing-stripe-migration.md`, `project-billing.md` for the project note itself).
+- `<type>-<topic>.md` when it is cross-cutting (e.g. `context-oncall-rotation.md`).
+- kebab-case, `<topic>` 4 words max. Same `<project>` token for every note of a project.
+
 ## User's position
 
 When the user expresses a stance on a topic, add a `My position:` section at the end of the relevant note (before obsidian-graph). If no note exists, create one first (respect ingestion flow + dependencies).
