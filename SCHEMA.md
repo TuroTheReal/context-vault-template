@@ -148,7 +148,7 @@ ingested_in: [decision-xyz.md]       # reverse lookup, filled when ingested
 
 **Before every ingestion: re-read CLAUDE.md + SCHEMA.md.** Not from memory — actually read the files.
 
-One note per ingestion. For 2+ notes: spawn one agent per note (model: opus, thinking: on, effort: max). Never batch-process in a loop.
+One note per ingestion. For 2+ notes: run the ingestions **sequentially in the current session**, one note at a time, each one fully completed (written, checked, logged) before the next. This is the default because it is much cheaper in Claude usage (tokens / plan credits): the schema and the source are read once, not once per note. Spawning one agent per note (isolated context, parallelizable, but every agent re-reads the schema and the source) is opt-in, only when the user explicitly asks for it. Never bundle several ideas into one note.
 
 ### Two entry flows
 
