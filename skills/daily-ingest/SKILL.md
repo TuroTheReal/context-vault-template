@@ -51,6 +51,7 @@ All optional:
 
 ### Step 1 — external sources of the day (fetch via dedicated cursor)
 
+- **Skip this whole step** if every `fetch_sources.*` toggle in `.vault-config.yml` is `false` (typical personal vault: no Slack / Notion / Linear), or if `--no-sources` is passed. Go straight to Step 2; do not call `/fetch-sources`.
 - Run `/fetch-sources --cursor ingest --summary full --no-dms`. This fetches the day's delta from the **your-company core sources** (Slack channel mentions/threads, Notion, GitHub PRs/issues, GitHub Discussions, Linear) since `last_ingest`, and writes `digest/<date>-fetch-summary.md`. `--cursor ingest` reads/writes `last_ingest.<source>` (NOT `last_fetch`), so the digest's window is untouched. **`--no-dms` is mandatory here**: Slack DMs are private and must never be auto-ingested into the vault (the digest fetches them for your own inbox, the ingest does not).
 - `fetch-sources` no longer deposits individual raws — it produces this single summary. `/ingest` consumes the summary directly (it accepts a raw OR the whole summary).
 - Apply the "content > event" filter: noise (auto-tag / CODEOWNERS review-requests, pure logistics) is NOT promoted to notes — only items carrying a decision / position / tradeoff / learning. your own active Linear/GitHub work IS signal.
@@ -58,13 +59,13 @@ All optional:
 
 ### Step 2 — reasoning capture (Claude Code transcripts)
 
-- Find CC transcripts modified since `last_ingest`: `~/.claude/projects/*/*.jsonl`. **Exclude** `**/subagents/**` and `**/workflows/**` (internal agent runs, not your reasoning), **AND any project dir matching `exclude_projects` in the gitignored `.vault-config.local.yml`** (your personal repos, the same shared list `/learn-feedback` uses; kept machine-local so the names never enter the committed vault; substring match on the encoded dir name, e.g. `-Users-you-Documents-<personal-repo>`; file absent/empty → scan all). Prefer sessions where you actually interacted (real `type=="user"` text messages, not just tool-results).
+- Find CC transcripts modified since `last_ingest`: `~/.claude/projects/*/*.jsonl`. **Exclude** `**/subagents/**` and `**/workflows/**` (internal agent runs, not your reasoning), **then apply the project filters of the gitignored `.vault-config.local.yml`** (shared with `/learn-feedback`; kept machine-local so project names never enter the committed vault; substring match on the encoded dir name, e.g. `-Users-you-Documents-<repo>`): if `include_projects` is non-empty, keep ONLY the matching project dirs; then drop any dir matching `exclude_projects`. File absent / both lists empty → scan all. Prefer sessions where you actually interacted (real `type=="user"` text messages, not just tool-results).
   - **Mixed-session caveat** (same as `/learn-feedback`): the filter matches on the project dir (cwd at launch). Personal-repo work done from *inside* another project's session is NOT caught by the dir filter — drop those episodes at capture time when a raw is clearly scoped to an excluded personal repo.
 - Extract **only your signal**:
   - `type == "user"` entries whose content is genuine you text (a plain string), NOT injected tool-results/system reminders.
   - your explicit decisions: validations ("go", "ok", "valide"), your picks in `AskUserQuestion` answers, your corrections.
 - **Do NOT** capture assistant turns as your position (apply the Fidelity rule).
-- Group into atomic ideas by topic/project. For each, write a raw under `<VAULT>/raw/conversations/<date>-<topic-slug>.md`:
+- Group into atomic ideas by topic/project. For each, write a raw under `<VAULT>/raw/claude/<date>-<topic-slug>.md`:
   - Frontmatter: `source: claude-code-conversation`, `date`, `session_id`, `ingested: false`.
   - Body: faithful, factual capture of what **you said/decided** ("you a dit/décidé/validé …"). No assistant analysis, no inference.
 
@@ -85,13 +86,13 @@ All optional:
 ## Notes
 
 - **One PR/day, hard rule.** The whole point of `--no-pr` + single branch is to avoid PR spam. A git-spice stack is the only acceptable alternative if ever needed; default is one flat PR with N commits.
-- **No cursor conflict with the digest:** daily-ingest reads existing raws + transcripts via its own `last_ingest`; it never calls `fetch-sources` and never advances `last_fetch`.
+- **No cursor conflict with the digest:** daily-ingest calls `fetch-sources --cursor ingest` (Step 1), which reads/writes its own `last_ingest`; it never advances `last_fetch`.
 - **Reuses `/ingest`** for synthesis (your intent). Manual `/ingest <source>` is unchanged and stays available.
 - **Dedup:** raws are content-hashed by `/capture`; already-ingested raws (`ingested: true`) are skipped.
 
 ## Related
 
 - [/ingest](../ingest/SKILL.md) — does the actual synthesis (called with `--no-pr` here)
-- [/fetch-sources](../fetch-sources/SKILL.md) — deposits the external raws daily-ingest consumes (run by the digest, not here)
+- [/fetch-sources](../fetch-sources/SKILL.md): called in Step 1 with `--cursor ingest`, writes the fetch-summary daily-ingest consumes
 - [/daily-digest](../daily-digest/SKILL.md) — morning read recap (separate cursor, separate purpose)
 - Vault schema: `<VAULT>/CLAUDE.md` + `<VAULT>/SCHEMA.md`

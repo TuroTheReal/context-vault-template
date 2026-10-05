@@ -130,6 +130,8 @@ Keep the two layers consistent before mining (VAULT WINS):
 - **Apply exclusions** (`exclude_projects` lives in the gitignored `.vault-config.local.yml`, shared
   with `/daily-ingest`, so personal repo names stay out of the committed vault; `exclude_sessions`
   stays under `learn_feedback:` in `.vault-config.yml`):
+  - if `include_projects` is non-empty, keep ONLY transcripts whose project dir matches it
+    (allowlist, e.g. a personal vault tracking a chosen subset of projects),
   - drop any transcript whose project dir matches `exclude_projects` (substring/glob on the encoded
     dir name, e.g. `-Users-you-Documents-<personal-repo>`),
   - drop any session whose id is in `learn_feedback.exclude_sessions`,

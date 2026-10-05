@@ -220,7 +220,7 @@ Every piece of knowledge in the vault traces back to an external source via this
 
 ## 🛠️ Skills
 
-Seven operational skills, each a Claude Code skill in `skills/<name>/SKILL.md` (run as-is, no implementation needed):
+Eight operational skills, each a Claude Code skill in `skills/<name>/SKILL.md` (run as-is, no implementation needed). `bootstrap.sh` links all of them by default; pass `--skills capture,ingest,...` to link only a subset:
 
 | Skill | Purpose |
 |-------|---------|
@@ -230,6 +230,7 @@ Seven operational skills, each a Claude Code skill in `skills/<name>/SKILL.md` (
 | [`/audit-vault`](skills/audit-vault/SKILL.md) | Health check — stale notes, broken links, schema violations |
 | [`/daily-digest`](skills/daily-digest/SKILL.md) | Daily brief and actionable inbox from the day's activity |
 | [`/daily-ingest`](skills/daily-ingest/SKILL.md) | Automatic daily enrichment, bundled into one PR for review |
+| [`/learn-feedback`](skills/learn-feedback/SKILL.md) | Learn your preferences from Claude Code transcripts into the `feedback/` layer, one PR for review |
 | [`/linear-project-update`](skills/linear-project-update/SKILL.md) | Weekly project status update (Highlights / Lowlights / Focus) |
 
 The skills are config-driven: they read `.vault-config.yml` at runtime (handles, paths, enabled sources), so the same skill works against any vault without code changes. Only the `tools/` cron wrappers (`run-*.sh` + launchd plists) hard-code paths, and `bootstrap.sh --with-automation` substitutes them for you.

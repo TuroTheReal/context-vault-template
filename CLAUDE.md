@@ -14,7 +14,7 @@ Frontmatter templates, the tag taxonomy, link axes, author attribution, the raw 
 
 ## Skills (operational tooling)
 
-The vault is operated via 4 user-level skills. Full SKILL.md files live in `skills/`. This is just a pointer.
+The vault is operated via user-level skills. Full SKILL.md files live in `skills/`, the complete list in `skills/README.md`. This is just a pointer to the core ones.
 
 - **`/capture <URL>`** — archive a source as raw (full content for volatile sources, stub for stable ones). No synthesis.
 - **`/ingest <URL | raw-file | digest-summary>`** — synthesize into `notes/`. Runs `/capture` internally if given a URL. On stub raw, does a live fetch of the source. Can also synthesize a fetch-summary in `digest/` (e.g. weekly synthesis).
