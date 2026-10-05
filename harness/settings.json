@@ -25,9 +25,9 @@
       "Bash(git show:*)",
       "Bash(git branch:*)",
       "Bash(git add:*)",
-      "Read(<vault>/**)",
-      "Edit(<vault>/**)",
-      "Write(<vault>/**)"
+      "Read(/<vault>/**)",
+      "Edit(/<vault>/**)",
+      "Write(/<vault>/**)"
     ],
     "deny": [],
     "ask": []
