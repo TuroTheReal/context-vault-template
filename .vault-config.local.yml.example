@@ -1,8 +1,16 @@
 # Machine-local vault config — copy to .vault-config.local.yml (gitignored, NOT committed).
-# Keeps your personal project names OUT of the committed vault while still driving the
-# Claude Code transcript-scan exclusion in /daily-ingest and /learn-feedback.
+# Keeps project names OUT of the committed vault while still driving the
+# Claude Code transcript scan in /daily-ingest and /learn-feedback.
 #
-# exclude_projects: Claude Code project dirs to EXCLUDE from the transcript scan. Match = substring
-# on the encoded ~/.claude/projects/ dir name (e.g. "-Users-you-Documents-your-personal-repo").
-# Glob (*) ok. Absent / empty → scan all projects.
+# Both lists match on the encoded ~/.claude/projects/ dir name (substring, glob (*) ok),
+# e.g. "-Users-you-Documents-your-repo" or "-home-you-your-repo".
+#
+# include_projects: ALLOWLIST. Non-empty → ONLY these project dirs are scanned.
+#   Use it for a personal vault that tracks a chosen subset of your projects.
+#   Absent / empty → every project dir is a candidate.
+include_projects: []
+#
+# exclude_projects: DENYLIST, applied after include_projects.
+#   Use it for a work vault that must ignore your personal repos.
+#   Absent / empty → nothing excluded.
 exclude_projects: []

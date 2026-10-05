@@ -2,7 +2,7 @@
 
 Operational skills for the context vault. Each skill is documented as a self-contained `SKILL.md` in its own folder, in the native Claude Code format.
 
-This folder is **documentation only** — no install script, no symlinks. If you want to use these skills in your own Claude Code setup, copy them to `~/.claude/skills/<name>/` (user-level) yourself.
+`bootstrap.sh` symlinks **every** skill folder found here into `~/.claude/skills/<name>` (user-level, override with `--skills-dir`). An existing entry with the same name is skipped, never overwritten. To leave a skill out, do not link it, or remove its symlink from `~/.claude/skills/` afterwards (the folder in the vault stays untouched).
 
 ## Documented skills
 

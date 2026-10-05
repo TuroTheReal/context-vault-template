@@ -55,10 +55,11 @@ audit:
   stale_note_days: 90                 # status: active + updated > X days → flagged stale
   pending_raw_days: 30                # ingested: false + captured > X days → flagged pending
 
-# Personal-project exclusions — repos that are YOURS, not work. Excluded from the Claude Code
-# transcript scan by BOTH /daily-ingest AND /learn-feedback. The list lives in the gitignored
-# .vault-config.local.yml (copy from .vault-config.local.yml.example) so personal project names
-# never enter your committed vault. Absent / empty → scan all projects.
+# Project filters for the Claude Code transcript scan, used by BOTH /daily-ingest AND /learn-feedback:
+# include_projects (allowlist, e.g. a personal vault tracking chosen projects) and exclude_projects
+# (denylist, e.g. a work vault ignoring your personal repos). Both live in the gitignored
+# .vault-config.local.yml (copy from .vault-config.local.yml.example) so project names never enter
+# your committed vault. Absent / empty → scan all projects.
 
 # Learn-feedback — extra mining scope (read by /learn-feedback only; the personal-repo exclusion is
 # the shared exclude_projects in .vault-config.local.yml)

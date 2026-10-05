@@ -4,8 +4,9 @@
 #
 # Turns a fresh clone of this template into a working vault: creates the local
 # config/state files, fills the one deterministic value (vault_path), wires the
-# skills + harness config (global CLAUDE.md, settings) into Claude Code, and drops the template's maintainer-only CI (the
-# neutralization guard is for the public template, not your private instance).
+# skills + harness config (global CLAUDE.md, settings) into Claude Code. It deletes
+# nothing: the template's neutralization CI job is gated on the template repo and
+# skips itself on your instance (shellcheck + gitleaks keep running).
 # Personal handles and the
 # source toggles stay a manual edit (a handful of one-time fields) — this script
 # does the mechanical toil, not the personal choices.
@@ -18,6 +19,8 @@
 # Options:
 #   --target DIR        Vault directory to initialize (default: this script's dir)
 #   --skills-dir DIR    Where to symlink skills (default: ~/.claude/skills)
+#   --skills LIST       Comma-separated skills to link (default: all). e.g. capture,ingest,audit-vault
+#                       Unlisted skills stay in the vault, just not linked into Claude Code.
 #   --with-agents       Wire harness/agents/ personas (+ the gated-loop pattern) into ~/.claude/agents.
 #                       Off by default: personas dispatch subagents (extra context + opus models) = higher token cost.
 #   --with-automation   Substitute + install the launchd cron agents (macOS)
@@ -39,6 +42,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 # --- defaults ----------------------------------------------------------------
 TARGET="$SCRIPT_DIR"
 SKILLS_DIR="${HOME}/.claude/skills"
+SKILLS_ONLY=""
 WITH_AUTOMATION=false
 WITH_AGENTS=false
 
@@ -74,6 +78,7 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --target)      TARGET="${2:?--target needs a directory}"; shift 2 ;;
     --skills-dir)  SKILLS_DIR="${2:?--skills-dir needs a directory}"; shift 2 ;;
+    --skills)      SKILLS_ONLY="${2:?--skills needs a comma-separated list}"; shift 2 ;;
     --with-agents) WITH_AGENTS=true; shift ;;
     --with-automation) WITH_AUTOMATION=true; shift ;;
     -h|--help)     usage 0 ;;
@@ -87,6 +92,14 @@ fi
 TARGET="$resolved"
 [[ -f "$TARGET/CLAUDE.md" && -f "$TARGET/.vault-config.yml.example" ]] \
   || die "not a context-vault template (missing CLAUDE.md or .vault-config.yml.example): $TARGET"
+
+# Validate --skills before any side effect: a typo must not half-bootstrap the vault.
+if [[ -n "$SKILLS_ONLY" ]]; then
+  IFS=',' read -r -a requested <<< "$SKILLS_ONLY"
+  for s in "${requested[@]}"; do
+    [[ -f "$TARGET/skills/$s/SKILL.md" ]] || die "--skills: unknown skill '$s' (see $TARGET/skills/)"
+  done
+fi
 
 printf '🌱 Bootstrapping context vault at: %s\n' "$TARGET"
 
@@ -114,7 +127,9 @@ for skill_dir in "$TARGET"/skills/*/; do
   [[ -f "${skill_dir}SKILL.md" ]] || continue
   name="$(basename "$skill_dir")"
   link="$SKILLS_DIR/$name"
-  if [[ -e "$link" || -L "$link" ]]; then
+  if [[ -n "$SKILLS_ONLY" && ",$SKILLS_ONLY," != *",$name,"* ]]; then
+    info "$name → not in --skills, not linked"
+  elif [[ -e "$link" || -L "$link" ]]; then
     warn "$name → already present, skipped"
   else
     ln -s "${skill_dir%/}" "$link"
@@ -123,15 +138,6 @@ for skill_dir in "$TARGET"/skills/*/; do
   fi
 done
 ok "$linked skill(s) linked"
-
-# --- 2b. drop template-maintainer tooling (this is a private instance now) ---
-step "Template tooling"
-if [[ -d "$TARGET/.github" ]]; then
-  rm -rf "$TARGET/.github"
-  ok "removed .github/ (neutralization guard + template CI are maintainer-only)"
-else
-  info ".github/ already absent"
-fi
 
 # --- 2c. wire harness config (global ~/.claude) ------------------------------
 if [[ -d "$TARGET/harness" ]]; then

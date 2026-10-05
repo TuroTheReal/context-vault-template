@@ -5,8 +5,8 @@
 .vault-state.yml
 .vault-state.yml.lock
 
-# Machine-local vault config (personal-project exclusions — keeps personal repo names out of the vault)
-# Copy .vault-config.local.yml.example → .vault-config.local.yml and fill in exclude_projects.
+# Machine-local vault config (project include/exclude filters, keeps project names out of the vault)
+# Copy .vault-config.local.yml.example → .vault-config.local.yml and fill in include_projects / exclude_projects.
 .vault-config.local.yml
 
 # Audit reports (generated artefacts, not vault content)

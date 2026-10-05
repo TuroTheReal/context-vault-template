@@ -33,6 +33,9 @@ jobs:
 
   neutralization:
     name: neutralized
+    # Maintainer-only guard for the PUBLIC template. Private instances keep the file
+    # (bootstrap deletes nothing) and skip this job; shellcheck + gitleaks still run.
+    if: github.repository == 'TuroTheReal/context-vault-template'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
