@@ -31,6 +31,7 @@ branch_prefix: vault-sync             # branches: vault-sync/YYYY-MM-DD-<slug>
 auto_merge: false                     # never. PR review is the safety net.
 
 # Fetch-sources — which sources to sweep in batch
+# Only /fetch-sources reads these: a manual /capture or /ingest works on any source, enabled here or not.
 # Enable only the sources you actually use. Adapt the source list to your stack.
 fetch_sources:
   slack: false                        # set true if you use Slack (DMs feed the digest inbox; /daily-ingest runs --no-dms so DMs are never auto-ingested)

@@ -180,7 +180,7 @@ Static config: paths, handles, git mode, enabled sources, audit thresholds. Chan
 | `vault_path` | Absolute path to the vault directory |
 | `user_handle.<source>` | Your handle per source — used in API filters |
 | `git_mode.notes` | `true` recommended — opens a PR on each ingest for review and rollback |
-| `fetch_sources.<source>` | Boolean per source (Slack, Notion, GitHub, web, meetings) |
+| `fetch_sources.<source>` | Boolean per source (Slack, Notion, GitHub, web, meetings): what `/fetch-sources` sweeps. Manual `/capture` / `/ingest` ignore it |
 | `audit.stale_note_days` | Threshold for stale-note detection (default: 90) |
 | `audit.pending_raw_days` | Threshold for pending-raw detection (default: 30) |
 
