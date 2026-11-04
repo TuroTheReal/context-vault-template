@@ -42,7 +42,7 @@ Does not read `.vault-state.yml` (no high-water mark needed for single-note inge
 ## Behavior — high level
 
 ```
-Input → resolve raw (capture if needed, live-fetch if stub) →
+Input → sync main (pull --ff-only, clean merged branches) → resolve raw (capture if needed, live-fetch if stub) →
   analyze content → determine type + links →
   decide create vs update →
   write/patch note (frontmatter + body + citations + position + obsidian-graph) →
@@ -56,6 +56,14 @@ Input → resolve raw (capture if needed, live-fetch if stub) →
 ### Step 0 — re-read schema
 
 Read `<vault>/CLAUDE.md` + `<vault>/SCHEMA.md` in full. Never operate from memory. The schema is the source of truth.
+
+### Step 0b: sync the live vault (skip with `--no-pr` or `git_mode.notes: false`)
+
+The ingest PR is merged later, outside the skill, so the local `main` (the live memory) lags behind until someone pulls. Sync it before writing:
+
+- **Current branch is `main`** → `git pull --ff-only origin main`. It either fast-forwards or aborts without touching the working tree. **On failure** (local `main` diverged, or an uncommitted change in a file the merge touches, e.g. another session mid-ingest): stop, show the git message, let the user decide. Never stash, reset, rebase or plain `git pull`.
+- **Current branch is not `main`** → do not pull, tell the user. Step 10 branches off `origin/main` anyway.
+- **Clean merged local branches**: for each local `vault-sync/*` branch other than the current one, delete it with `git branch -D` only if `gh pr list --head <branch> --state merged --json number` returns a PR. `git branch -d` refuses squash-merged branches, hence the check on GitHub. A branch with an open PR, a closed-unmerged PR or no PR is kept.
 
 ### Step 1 — resolve raw
 
@@ -195,13 +203,15 @@ git checkout -b vault-sync/YYYY-MM-DD-<short-slug> origin/main   # always branch
 # (if branch already exists locally → see "Branch reuse / conflict" below; the skill will checkout the existing branch instead of recreating)
 git add notes/<note>.md index.md log.md
 git add raw/<path>.md                                   # if raw frontmatter changed
+git add memory/<file>.md                                # only memory derived from this ingest (see below)
 git commit -m "ingest: <action> <note-name> from <short source label>"
 git push -u origin vault-sync/YYYY-MM-DD-<short-slug>
 gh pr create --title "vault-sync: <action> <note-name>" --body "<diff summary + sources>"
 ```
 
 - `auto_merge: false` always: the user reviews and merges
-- After the PR is opened, **switch back to `main`** (`git checkout main`). The vault working tree may be the live memory (`memory/` symlinked by bootstrap): while a `vault-sync/...` branch is checked out, every session reads that branch, and a memory edit made there leaves with the PR instead of landing on `main`.
+- **Memory derived from this ingest goes in the same commit**: if the new or updated note makes a `memory/` pointer or summary wrong or stale, patch it and commit it with the note. Merging lands notes and memory together; closing the PR without merge drops both, so memory never points to notes that never landed. Memory changes **unrelated** to this ingest (feedback, preferences given during the session) are not added: they stay on `main`.
+- After the PR is opened, **switch back to `main`** (`git checkout main`). The vault working tree may be the live memory (`memory/` symlinked by bootstrap): while a `vault-sync/...` branch is checked out, every session reads that branch. The merged changes reach the live memory at the next Step 0b (`git pull --ff-only`).
 - One ingest = one commit. Multiple ingests in a session = multiple commits on the same `vault-sync/<date>-<slug>` branch (or separate branches if independent)
 - Output the PR URL
 
